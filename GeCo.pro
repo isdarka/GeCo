@@ -13,8 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    DataBase/connection.cpp \
+    mysqlsettings.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    DataBase/connection.h \
+    mysqlsettings.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    mysqlsettings.ui
