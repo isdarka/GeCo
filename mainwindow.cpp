@@ -94,3 +94,66 @@ void MainWindow::on_actionLoad_Model_triggered()
         QMessageBox::warning(NULL, "Error", e);
     }
 }
+
+void MainWindow::on_actionPrefixes_triggered()
+{
+    prefixesForm.show(this->appSettings);
+
+}
+
+
+//Generate default model
+void MainWindow::on_actionDefault_Model_triggered()
+{
+    this->appSettings->beginGroup("parameters");
+    this->fileDialog.setFileMode(QFileDialog::Directory);
+    this->fileDialog.setDirectory(this->appSettings->value("pathToSave",QDir::currentPath()).toString());
+    this->fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
+
+    if ( this->fileDialog.exec() == QDialog::Accepted )
+    {
+        this->appSettings->setValue("pathToSave",this->fileDialog.selectedFiles());
+    }
+
+    this->appSettings->endGroup();
+    try{
+        this->connection = new Connection(this->appSettings);
+        this->connection->connect();
+        geco.generateXML(this->appSettings);
+//       geco.generateXML(this->appSettings);
+       QMessageBox::information(this, "Info", "Default Model Generated.");
+
+    }catch(QString e){
+        QMessageBox::warning(NULL, "Error", e);
+    }
+}
+
+void MainWindow::on_actionGenerate_triggered()
+{
+    QString fileString;
+    QFile file;
+    QDomDocument document;
+
+    try{
+        this->appSettings->beginGroup("parameters");
+        fileString = this->appSettings->value("fileToLoad").toString();
+        this->appSettings->endGroup();
+
+        file.setFileName(fileString);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            throw QString("Failed to open file ").append(fileString);
+
+        else
+        {
+            if(!document.setContent(&file))
+                throw QString("Failed to load document.").append(fileString);
+
+            file.close();
+        }
+
+        this->geco.read(document);
+
+    }catch(QString e){
+        QMessageBox::warning(NULL, "Error", e);
+    }
+}

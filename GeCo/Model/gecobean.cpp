@@ -39,9 +39,9 @@ void GeCoBean::setModel(bool boolean)
     this->model = boolean;
 }
 
-void GeCoBean::setController(bool boolean)
+void GeCoBean::setCrud(bool boolean)
 {
-    this->controller = boolean;
+    this->crud = boolean;
 }
 
 void GeCoBean::setView(bool boolean)
@@ -90,9 +90,9 @@ bool GeCoBean::getModel()
     return this->model;
 }
 
-bool GeCoBean::getController()
+bool GeCoBean::getCrud()
 {
-    return this->controller;
+    return this->crud;
 }
 
 bool GeCoBean::getView()

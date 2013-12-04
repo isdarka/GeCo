@@ -11,6 +11,9 @@
 
 #include "mysqlsettings.h"
 #include "DataBase/connection.h"
+#include "prefixes.h"
+#include "GeCo/geco.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -36,10 +39,18 @@ private slots:
 
     void on_actionLoad_Model_triggered();
 
+    void on_actionPrefixes_triggered();
+
+    void on_actionDefault_Model_triggered();
+
+    void on_actionGenerate_triggered();
+
 private:
     Ui::MainWindow *ui;
     MysqlSettings mysqlSettingsForm;
+    Prefixes prefixesForm;
     Connection *connection;
+    GeCo geco;
 };
 
 #endif // MAINWINDOW_H

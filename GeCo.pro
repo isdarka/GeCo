@@ -18,14 +18,17 @@ SOURCES += main.cpp\
     mysqlsettings.cpp \
     Table/Model/fieldbean.cpp \
     GeCo/Model/gecobean.cpp \
-    GeCo/geco.cpp
+    GeCo/geco.cpp \
+    prefixes.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
     mysqlsettings.h \
     Table/Model/fieldbean.h \
     GeCo/Model/gecobean.h \
-    GeCo/geco.h
+    GeCo/geco.h \
+    prefixes.h
 
 FORMS    += mainwindow.ui \
-    mysqlsettings.ui
+    mysqlsettings.ui \
+    prefixes.ui

@@ -15,7 +15,7 @@ public:
     void setExtend(QString str);
     void addRelation(QString str);
     void setModel(bool boolean);
-    void setController(bool boolean);
+    void setCrud(bool boolean);
     void setView(bool boolean);
     void setLog(bool boolean);
     void setForm(bool boolean);
@@ -28,7 +28,7 @@ public:
     QString getExtend();
     QStringList getRelations();
     bool getModel();
-    bool getController();
+    bool getCrud();
     bool getView();
     bool getForm();
     bool getLog();
@@ -43,7 +43,7 @@ private:
     QStringList relations;
     bool form;
     bool model;
-    bool controller;
+    bool crud;
     bool view;
     bool log;
     QString logName;
