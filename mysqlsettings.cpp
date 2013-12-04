@@ -6,6 +6,11 @@ MysqlSettings::MysqlSettings(QWidget *parent) :
     ui(new Ui::MysqlSettings)
 {
     ui->setupUi(this);
+    // Move Window to Center
+    QRect position = frameGeometry();
+    position.moveCenter(QDesktopWidget().availableGeometry().center());
+    move(position.topLeft());
+    // /END Move Window to Center
 }
 
 MysqlSettings::~MysqlSettings()
@@ -18,7 +23,7 @@ void MysqlSettings::show(QSettings *settings)
     this->settings = settings;
     this->settings->beginGroup("MysqlSettings");
     ui->hostname->setText(this->settings->value("hostname").toString());
-    ui->username->setText(this->settings->value("username").toString());
+    ui->username->setText(this->settings->value("username","3306").toString());
     ui->password->setText(this->settings->value("password").toString());
     ui->schema->setText(this->settings->value("schema").toString());
     ui->port->setText(this->settings->value("port").toString());
@@ -43,5 +48,7 @@ void MysqlSettings::on_saveButton_clicked()
     this->settings->setValue("schema",ui->schema->text());
     this->settings->setValue("port",ui->port->text());
     this->settings->endGroup();
+    QMessageBox::information(this, "Info", "MySql Settings Saved.");
+
     this->close();
 }

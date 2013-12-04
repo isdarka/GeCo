@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QSettings>
+#include <QRect>
+#include <QDesktopWidget>
+#include <QMessageBox>
 namespace Ui {
 class MysqlSettings;
 }

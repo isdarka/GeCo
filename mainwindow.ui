@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>GeCo</string>
   </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QMenuBar" name="menuBar">
@@ -35,6 +35,8 @@
      <string>Tools</string>
     </property>
     <addaction name="actionMySql_Configuration"/>
+    <addaction name="actionPath_To_Save"/>
+    <addaction name="actionTest_Connection"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -67,6 +69,16 @@
   <action name="actionMySql_Configuration">
    <property name="text">
     <string>MySql Configuration</string>
+   </property>
+  </action>
+  <action name="actionPath_To_Save">
+   <property name="text">
+    <string>Path To Save</string>
+   </property>
+  </action>
+  <action name="actionTest_Connection">
+   <property name="text">
+    <string>Test Connection</string>
    </property>
   </action>
  </widget>

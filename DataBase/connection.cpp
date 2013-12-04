@@ -10,6 +10,7 @@ QSqlDatabase Connection::connect()
     this->db = QSqlDatabase::addDatabase("QMYSQL");
     this->settings->beginGroup("MysqlSettings");
     this->db.setHostName(this->settings->value("hostname").toString());
+    this->db.setPort(this->settings->value("port", "3306").toInt());
     this->db.setDatabaseName(this->settings->value("schema").toString());
     this->db.setUserName(this->settings->value("username").toString());
     this->db.setPassword(this->settings->value("password").toString());

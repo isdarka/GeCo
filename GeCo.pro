@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,11 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     DataBase/connection.cpp \
-    mysqlsettings.cpp
+    mysqlsettings.cpp \
+    Table/Model/fieldbean.cpp \
+    GeCo/Model/gecobean.cpp \
+    GeCo/geco.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
-    mysqlsettings.h
+    mysqlsettings.h \
+    Table/Model/fieldbean.h \
+    GeCo/Model/gecobean.h \
+    GeCo/geco.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui

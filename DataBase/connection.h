@@ -4,7 +4,8 @@
 #include <QSettings>
 #include <QtSql/QSqlDatabase>
 #include <QtSql>
-
+#include <QString>
+#include <QMessageBox>
 class Connection
 {
 public:
