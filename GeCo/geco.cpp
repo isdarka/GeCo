@@ -227,13 +227,15 @@ void GeCo::generateModel(GeCoBean model)
     else
         metadata->write(this->path + "/module/Application/src/Application/Model/Metadata/" + model.getName() + "Metadata.php");
 
+    //Generate Collection
+    ZfCollection *collection = new ZfCollection(model,this->beans);
+    collection->generate();
+    if(!model.isDefaultModule())
+        collection->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Collection/" + model.getName() + "Collection.php");
+    else
+        collection->write(this->path + "/module/Application/src/Application/Model/Collection/" + model.getName() + "Collection.php");
 
-//    ZfCollection *collection = new ZfCollection(model,this->beans);
-//    collection->generate();
-//        if(!model.isDefaultModule())
-//            collection->write(this->path + "/" + model.getModule() + "/src/" + model.getModule() + "/Model/Collection/" + model.getName() + "Collection.php");
-//        else
-//            collection->write(this->path + "/Application/src/Application/Model/Collection/" + model.getName() + "Collection.php");
+
 
 }
 

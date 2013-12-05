@@ -69,7 +69,7 @@ void ZfException::generate()
     this->code.setNamespace(this->model.getModule() + "\\Model\\Exception");
     if(!this->model.getExtend().isEmpty())
         if(this->model.getModule() != extra.getModule())
-            this->code.addUse(extra.getModule() + "\\Model\\Exception\\" + extra.getName() + "\\Exception");
+            this->code.addUse(extra.getModule() + "\\Model\\Exception\\" + extra.getName() + "Exception");
 
 
 }

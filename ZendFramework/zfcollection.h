@@ -1,7 +1,7 @@
 #ifndef ZFCOLLECTION_H
 #define ZFCOLLECTION_H
 
-#include "GeCo/Model/gecobean.h"
+#include <GeCo/Model/gecobean.h>
 #include <QVector>
 #include <CodeGenerator/docblock.h>
 #include <CodeGenerator/method.h>
@@ -9,8 +9,6 @@
 #include <CodeGenerator/propertie.h>
 #include "DataBase/Model/columnbean.h"
 #include "DataBase/Model/tablecatalog.h"
-
-
 #include <QDebug>
 #include <QDateTime>
 #include <QFile>
@@ -27,13 +25,8 @@ private:
     QVector<GeCoBean> models;
     QVector<ColumnBean> columns;
     QString ucfirst(QString str);
+    QString lcFirst(QString str);
     PhpClass code;
-    Docblock classDocBlock();
-    Method getConstruct();
-    ColumnBean getPrimaryKey();
-    Method getAppend();
-    Method getIsEmpty();
-    Method getRemove();
 };
 
 #endif // ZFCOLLECTION_H

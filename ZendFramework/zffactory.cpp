@@ -110,7 +110,7 @@ void ZfFactory::generate()
     this->code.setNamespace(this->model.getModule() + "\\Model\\Factory");
     if(!this->model.getExtend().isEmpty())
         if(this->model.getModule() != extra.getModule())
-            this->code.addUse(extra.getModule() + "\\Model\\Factory\\" + extra.getName() + "\\Factory");
+            this->code.addUse(extra.getModule() + "\\Model\\Factory\\" + extra.getName() + "Factory");
 
 
 }
