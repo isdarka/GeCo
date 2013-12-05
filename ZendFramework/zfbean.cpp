@@ -171,14 +171,18 @@ void ZfBean::generate()
     docblockToArray.addTag("return","array");
     methodToArray.setName("toArray");
     methodToArray.setVisibility(Method::PUBLIC);
-    methodToArray.addBody("return array(");
+    methodToArray.addBody("$array = array(");
     foreach (column, this->columns) {
         methodToArray.addBody("\tself::" + column.getField().toUpper() + " => " + "$this->get" + (this->ucfirst(column.getField())) + "(),");
     }
     methodToArray.addBody(");");
+    if(this->model.getExtend().isEmpty())
+        methodToArray.addBody("return $array;");
+    else
+        methodToArray.addBody("return array_merge(parent::toArray(), $array);");
+
     methodToArray.setDocblock(docblockToArray);
     this->code.addMethod(methodToArray);
-
 
        Docblock docblock;
        docblock.setShortDescription(this->model.getName() + "Bean");

@@ -43,6 +43,8 @@ QString Method::generate()
     QString body;
     method.append("\t"  + this->docblock.getDocblock("\t"));
     method.append(this->visibility);
+    if(this->getIsStatic())
+        method.append(" static");
     method.append(" function ");
     method.append(this->name);
     method.append("(");
