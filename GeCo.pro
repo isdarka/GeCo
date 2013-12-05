@@ -19,7 +19,11 @@ SOURCES += main.cpp\
     Table/Model/fieldbean.cpp \
     GeCo/Model/gecobean.cpp \
     GeCo/geco.cpp \
-    prefixes.cpp
+    prefixes.cpp \
+    CodeGenerator/propertie.cpp \
+    CodeGenerator/phpclass.cpp \
+    CodeGenerator/method.cpp \
+    CodeGenerator/docblock.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -27,7 +31,11 @@ HEADERS  += mainwindow.h \
     Table/Model/fieldbean.h \
     GeCo/Model/gecobean.h \
     GeCo/geco.h \
-    prefixes.h
+    prefixes.h \
+    CodeGenerator/propertie.h \
+    CodeGenerator/phpclass.h \
+    CodeGenerator/method.h \
+    CodeGenerator/docblock.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \
