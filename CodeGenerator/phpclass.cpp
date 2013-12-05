@@ -69,7 +69,18 @@ QString PhpClass::generate()
 
     //if(this->docblock == NULL)
 
-        code.append(this->docblock.getDocblock());
+    code.append(this->docblock.getDocblock());
+    code.append("\n");
+
+    code.append("namespace " + this->namespaceString + ";");
+    code.append("\n");
+    code.append("\n");
+    QString use;
+    foreach (use, this->uses) {        
+        code.append("use " + use + ";");
+        code.append("\n");
+    }
+    code.append("\n");
     code.append("class ");
     code.append(this->getClassName());
     if(this->isExtends())
@@ -114,4 +125,19 @@ void PhpClass::addPropertie(Propertie propertie)
 void PhpClass::setDocblock(Docblock docblock)
 {
     this->docblock = docblock;
+}
+
+void PhpClass::addUse(QString use)
+{
+    this->uses.append(use);
+}
+
+void PhpClass::setNamespace(QString namespaceString)
+{
+    this->namespaceString = namespaceString;
+}
+
+QString PhpClass::getNamespace()
+{
+    return this->namespaceString;
 }

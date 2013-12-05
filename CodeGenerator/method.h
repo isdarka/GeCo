@@ -17,6 +17,8 @@ public:
     void addBody(QString body);
     void setVisibility(QString type);
     void setDocblock(Docblock docblock);
+    void isStatic(bool boolean);
+    bool getIsStatic();
 private:
     QString name;
     QStringList params;
@@ -27,6 +29,7 @@ private:
     QStringList body;
     QString visibility;
     Docblock docblock;
+    bool methodStatic = false;
 };
 
 #endif // METHOD_H

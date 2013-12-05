@@ -114,3 +114,15 @@ bool GeCoBean::getForm()
 {
     return this->form;
 }
+
+bool GeCoBean::isDefaultModule()
+{
+    if(this->module.isEmpty())
+        return true;
+    else if(this->module.isNull())
+        return true;
+    else if (this->module.toLower() == "default")
+        return true;
+    else
+        return false;
+}

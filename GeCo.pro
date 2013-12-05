@@ -23,7 +23,13 @@ SOURCES += main.cpp\
     CodeGenerator/propertie.cpp \
     CodeGenerator/phpclass.cpp \
     CodeGenerator/method.cpp \
-    CodeGenerator/docblock.cpp
+    CodeGenerator/docblock.cpp \
+    ZendFramework/zfcollection.cpp \
+    ZendFramework/zfbean.cpp \
+    DataBase/Model/tablecatalog.cpp \
+    DataBase/Model/columnbean.cpp \
+    ZendFramework/zfexception.cpp \
+    ZendFramework/zffactory.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -35,7 +41,13 @@ HEADERS  += mainwindow.h \
     CodeGenerator/propertie.h \
     CodeGenerator/phpclass.h \
     CodeGenerator/method.h \
-    CodeGenerator/docblock.h
+    CodeGenerator/docblock.h \
+    ZendFramework/zfcollection.h \
+    ZendFramework/zfbean.h \
+    DataBase/Model/tablecatalog.h \
+    DataBase/Model/columnbean.h \
+    ZendFramework/zfexception.h \
+    ZendFramework/zffactory.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \

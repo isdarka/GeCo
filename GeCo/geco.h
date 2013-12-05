@@ -8,6 +8,11 @@
 #include <QStringList>
 #include <QDir>
 #include "GeCo/Model/gecobean.h"
+#include "ZendFramework/zfbean.h"
+#include "ZendFramework/zfcollection.h"
+#include "ZendFramework/zfexception.h"
+#include "ZendFramework/zffactory.h"
+
 class GeCo
 {
 public:
@@ -16,13 +21,16 @@ public:
     void read(QDomDocument document);
     //QString camelCase(QString str);
     QString path;
-
+    void generateCode(QSettings *settings);
+    void generateModel(GeCoBean model);
 private:
     QString camelCase(QString str);
     QStringList prefixes;
-    QDomDocument getDefault();
+    QDomDocument getDefault();    
+    void createStructure();
     void write(QDomDocument document);
-
+    QSettings *settings;
+     QVector<GeCoBean> beans;
 };
 
 #endif // GECO_H

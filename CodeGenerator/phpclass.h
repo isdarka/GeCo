@@ -23,12 +23,17 @@ public:
     void addMethod(Method method);
     void addPropertie(Propertie propertie);
     void setDocblock(Docblock docblock);
+    void addUse(QString use);
+    void setNamespace(QString namespaceString);
+    QString getNamespace();
 private:
     QString className;
     QString extends;
     QString implement;
+    QString namespaceString;
     QVector<Method> methods;
     QVector<Propertie> properties;
+    QVector<QString> uses;
     Docblock docblock;
 };
 

@@ -70,3 +70,12 @@ void Method::setDocblock(Docblock docblock)
     this->docblock = docblock;
 }
 
+void Method::isStatic(bool boolean)
+{
+    this->methodStatic = boolean;
+}
+
+bool Method::getIsStatic()
+{
+    return this->methodStatic;
+}

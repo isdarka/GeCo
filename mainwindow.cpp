@@ -152,6 +152,8 @@ void MainWindow::on_actionGenerate_triggered()
         }
 
         this->geco.read(document);
+        this->geco.generateCode(this->appSettings);
+
 
     }catch(QString e){
         QMessageBox::warning(NULL, "Error", e);

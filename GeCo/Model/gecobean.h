@@ -33,7 +33,7 @@ public:
     bool getForm();
     bool getLog();
     QString getLogName();
-
+    bool isDefaultModule();
 
 private:
     QString name;

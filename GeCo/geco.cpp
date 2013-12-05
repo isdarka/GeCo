@@ -123,24 +123,15 @@ void GeCo::write(QDomDocument document)
 
 void GeCo::read(QDomDocument document)
 {
-    QVector<GeCoBean> beans;
-    //get the root element
+    this->beans.empty();
+
     QDomElement root = document.firstChildElement();
 
-    //List the books
-//    ListElements(root,"Schema", "Name");
-
-  //  qDebug() << "\r\nMore Advanced\r\n";
-
-    //Get the chapters
     QDomNodeList schemas = root.elementsByTagName("schema");
-  //  qDebug() << schemas.count();
     for(int i = 0; i < schemas.count(); i++)
     {
         QDomNode schemaNode = schemas.at(i);
-       // qDebug() << schemas.QDomNodeList().count();
 
-        //convert to an element
         if(schemaNode.isElement())
         {
            GeCoBean bean;
@@ -169,69 +160,253 @@ void GeCo::read(QDomDocument document)
            bean.setLog(log.toElement().attribute("enable").toInt());
            bean.setLogName(log.toElement().attribute("tableName"));
 
-
-           qDebug() <<name.toElement().attribute("value");
-           qDebug() <<table.toElement().attribute("value");
-           qDebug() <<module.toElement().attribute("value");
-           qDebug() <<extend.toElement().attribute("value");
-           qDebug() <<model.toElement().attribute("value");
-           qDebug() <<crud.toElement().attribute("value");
-           qDebug() <<form.toElement().attribute("value");
-           qDebug() <<log.toElement().attribute("tableName");
             for(int i = 0; i < relationsTables.count(); i++)
             {
                 QDomNode relationTableName = relationsTables.at(i);
-                //convert to an element
+
                 if(relationTableName.isElement())
                 {
                     QDomElement relationTableNameElement = relationTableName.toElement();
-                    bean.addRelation(relationTableNameElement.attribute("value"));
-                   // qDebug() << "Chapters in " << relationTableNameElement.attribute("value");
-
+                    bean.addRelation(relationTableNameElement.attribute("value"));                  
                 }
             }
-            //qDebug() << "Relations = " << beans;
 
 
-            beans.append(bean);
-           /*
- <name value="Address"/>
-  <table value="common_address"/>
-  <module value="default"/>
-  <extend value=""/>
-  <relations>
-   <table value=""/>
-  </relations>
-  <model value="1"/>
-  <controller value="1"/>
-  <form value="1"/>
-  <view value="1"/>
-  <log tableName="tableName" enable="0"/>
+            this->beans.append(bean);
 
-  */
-//           qDebug() <<name.toElement().attribute("value");
-//           qDebug() <<table.toElement().attribute("value");
-//           qDebug() <<module.toElement().attribute("value");
-//           qDebug() <<extend.toElement().attribute("value");
-//           qDebug() <<model.toElement().attribute("value");
-//           qDebug() <<controller.toElement().attribute("value");
-//           qDebug() <<form.toElement().attribute("value");
-//           qDebug() <<log.toElement().attribute("tableName");
-        /*   QDomNodeList items = schema.elementsByTagName("name");
-           qDebug() << "Total items = " << items.count();
-           QDomNode name = items.at(i);
-           if(name.isElement())
-           {
-               QDomElement itemele = name.toElement();
-               qDebug() << itemele.attribute("value");
-           }*/
-//            QDomNodeList name = params.elementsByTagName("name");
-            //qDebug() << name..toElement().attribute("value");
+        }
+    }
+}
 
-          //  qDebug() << "Chapters in " << book.attribute("value");
-            //ListElements(book,"Chapter","Name");
+void GeCo::generateCode(QSettings *settings)
+{
+    this->settings = settings;
+    this->settings->beginGroup("parameters");
+    this->path = this->settings->value("pathToSave").toString();
+    this->settings->endGroup();
+    this->createStructure();
+    GeCoBean model;
+    foreach (model, this->beans) {
+        if(model.getModel())
+            this->generateModel(model);
+    }
+   // qDebug() << this->beans;
+}
+
+void GeCo::generateModel(GeCoBean model)
+{
+    //Generate BEAN
+    ZfBean *bean = new ZfBean(model,this->beans);
+    bean->generate();
+    if(!model.isDefaultModule())
+        bean->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Bean/" + model.getName() + ".php");
+    else
+        bean->write(this->path + "/module/Application/src/Application/Model/Bean/" + model.getName() + ".php");
+
+    //Generate Exception
+    ZfException *exception = new ZfException(model,this->beans);
+    exception->generate();
+    if(!model.isDefaultModule())
+        exception->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Exception/" + model.getName() + "Exception.php");
+    else
+        exception->write(this->path + "/module/Application/src/Application/Model/Exception/" + model.getName() + "Exception.php");
+
+    //Generate Factory
+    ZfFactory *factory = new ZfFactory(model,this->beans);
+    factory->generate();
+    if(!model.isDefaultModule())
+        factory->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Factory/" + model.getName() + "Factory.php");
+    else
+        factory->write(this->path + "/module/Application/src/Application/Model/Factory/" + model.getName() + "Factory.php");
+
+
+//    ZfCollection *collection = new ZfCollection(model,this->beans);
+//    collection->generate();
+//        if(!model.isDefaultModule())
+//            collection->write(this->path + "/" + model.getModule() + "/src/" + model.getModule() + "/Model/Collection/" + model.getName() + "Collection.php");
+//        else
+//            collection->write(this->path + "/Application/src/Application/Model/Collection/" + model.getName() + "Collection.php");
+
+}
+
+void GeCo::createStructure()
+{
+    //Root Directory
+    QDir dir(this->path);
+
+    QDir modulePath(dir.path().append("/module"));
+    if (!modulePath.exists())
+        modulePath.mkdir(modulePath.path());
+
+    QDir defaultModule(modulePath.path().append("/Application"));
+
+
+    QDir src("src");
+    QDir view("view");
+
+
+    QDir controller("Controller");
+    QDir model("Model");
+    QDir query("Query");
+
+    QDir bean("Bean");
+    QDir catalog("Catalog");
+    QDir collection("Collection");
+    QDir exception("Exception");
+    QDir factory("Factory");
+    QDir metadata("Metadata");
+
+
+    GeCoBean beanModel;
+    foreach (beanModel, this->beans) {
+        if(!beanModel.isDefaultModule())
+        {
+
+            QDir module(modulePath.path().append("/").append(beanModel.getModule()));
+            QDir currentModule(modulePath.path().append("/").append(beanModel.getModule()));
+            if (!module.exists())
+                module.mkdir(module.path());
+
+            module.setPath(currentModule.path().append("/").append(src.path()));
+
+            QDir moduleSrc(module.path().append("/").append(beanModel.getModule()));
+            QDir tmp(moduleSrc.path());
+
+            if (!module.exists())
+                module.mkdir(module.path());
+            module.setPath(currentModule.path().append("/").append(view.path()));
+
+            if (!module.exists())
+                module.mkdir(module.path());
+
+
+            if (!moduleSrc.exists())
+                moduleSrc.mkdir(moduleSrc.path());
+
+            tmp.setPath(tmp.path().append("/").append(controller.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(query.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            //MODEL
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(bean.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(catalog.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(collection.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(exception.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(factory.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(metadata.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+//            qDebug() << beanModel.getModule();
+        }else{
+            if (!defaultModule.exists())
+                defaultModule.mkdir(defaultModule.path());
+
+            QDir module(defaultModule.path());
+
+            module.setPath(defaultModule.path().append("/").append(src.path()));
+
+            QDir moduleSrc(module.path().append("/").append("Application"));
+            QDir tmp(moduleSrc.path());
+            if (!module.exists())
+                module.mkdir(module.path());
+            module.setPath(defaultModule.path().append("/").append(view.path()));
+
+            if (!module.exists())
+                module.mkdir(module.path());
+
+
+            if (!moduleSrc.exists())
+                moduleSrc.mkdir(moduleSrc.path());
+
+            tmp.setPath(tmp.path().append("/").append(controller.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(query.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            //MODEL
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(bean.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(catalog.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(collection.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(exception.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(factory.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(model.path()));
+            tmp.setPath(tmp.path().append("/").append(metadata.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
         }
     }
 
-  //  qDebug() << "Finished";
 }
