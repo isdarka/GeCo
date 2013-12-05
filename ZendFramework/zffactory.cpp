@@ -77,7 +77,8 @@ void ZfFactory::generate()
     methodPopulate.addParam(this->lcFirst(this->model.getName()));
     methodPopulate.addParam("fields");
 
-
+    if(!this->model.getExtend().isEmpty())
+        methodPopulate.addBody("parent::populate($" + this->lcFirst(this->model.getName()) +", $fields);");
     methodPopulate.addBody("if(!($" + this->lcFirst(this->model.getName()) +" instanceof " + this->model.getName() +"))");
     methodPopulate.addBody("\tthrow new ActionException('$" + this->lcFirst(this->model.getName()) +" must be instance of " + this->model.getName() +"');");
     methodPopulate.addBody("");
