@@ -12,6 +12,7 @@
 #include "ZendFramework/zfcollection.h"
 #include "ZendFramework/zfexception.h"
 #include "ZendFramework/zffactory.h"
+#include "ZendFramework/zfmetadata.h"
 
 class GeCo
 {

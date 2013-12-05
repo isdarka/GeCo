@@ -53,11 +53,6 @@ void ZfFactory::generate()
         this->code.setExtends("AbstractFactory");
 
 
-
-
-
-
-
     Method methodCreateFromArray;
     Docblock docblockTCreateFromArray;
     docblockTCreateFromArray.setShortDescription("Create " + this->model.getName() + " from array");
@@ -76,7 +71,6 @@ void ZfFactory::generate()
     Method methodPopulate;
     Docblock docblockPopulate;
     docblockPopulate.setShortDescription("Populate " + this->model.getName() + "");
-//    docblockPopulate.addTag("return",this->model.getName());
     methodPopulate.setName("populate");
     methodPopulate.setVisibility(Method::PUBLIC);
     methodPopulate.isStatic(true);
@@ -84,14 +78,14 @@ void ZfFactory::generate()
     methodPopulate.addParam("fields");
 
 
-    methodPopulate.addBody("if( !($" + this->lcFirst(this->model.getName()) +" instanceof " + this->model.getName() +") )");
+    methodPopulate.addBody("if(!($" + this->lcFirst(this->model.getName()) +" instanceof " + this->model.getName() +"))");
     methodPopulate.addBody("\tthrow new ActionException('$" + this->lcFirst(this->model.getName()) +" must be instance of " + this->model.getName() +"');");
     methodPopulate.addBody("");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
     foreach (column, this->columns) {
-        methodPopulate.addBody("if( isset($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"]) ){");
+        methodPopulate.addBody("if(isset($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"])){");
             methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"]);");
         methodPopulate.addBody("}");
         methodPopulate.addBody("");
@@ -99,25 +93,6 @@ void ZfFactory::generate()
 
     methodPopulate.setDocblock(docblockPopulate);
     this->code.addMethod(methodPopulate);
-
-//        public static function populate($action, $fields)
-//        {
-//            if( !($action instanceof Action) )
-//                throw new ActionException('$action must be instance of Action');
-
-//            if( isset($fields[Action::ID_ACTION]) ){
-//                $action->setIdAction($fields[Action::ID_ACTION]);
-//            }
-
-//            if( isset($fields[Action::ID_CONTROLLER]) ){
-//                $action->setIdController($fields[Action::ID_CONTROLLER]);
-//            }
-
-//            if( isset($fields[Action::NAME]) ){
-//                $action->setName($fields[Action::NAME]);
-//            }
-
-//        }
 
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Bean");

@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     DataBase/Model/tablecatalog.cpp \
     DataBase/Model/columnbean.cpp \
     ZendFramework/zfexception.cpp \
-    ZendFramework/zffactory.cpp
+    ZendFramework/zffactory.cpp \
+    ZendFramework/zfmetadata.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -47,7 +48,8 @@ HEADERS  += mainwindow.h \
     DataBase/Model/tablecatalog.h \
     DataBase/Model/columnbean.h \
     ZendFramework/zfexception.h \
-    ZendFramework/zffactory.h
+    ZendFramework/zffactory.h \
+    ZendFramework/zfmetadata.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \
