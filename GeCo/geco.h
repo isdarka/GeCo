@@ -13,6 +13,9 @@
 #include "ZendFramework/zfexception.h"
 #include "ZendFramework/zffactory.h"
 #include "ZendFramework/zfmetadata.h"
+#include "ZendFramework/zfcatalog.h"
+#include "ZendFramework/zfcrud.h"
+#include "ZendFramework/zfquery.h"
 
 class GeCo
 {
@@ -24,6 +27,7 @@ public:
     QString path;
     void generateCode(QSettings *settings);
     void generateModel(GeCoBean model);
+    void generateCRUD(GeCoBean model);
 private:
     QString camelCase(QString str);
     QStringList prefixes;

@@ -189,6 +189,9 @@ void GeCo::generateCode(QSettings *settings)
     foreach (model, this->beans) {
         if(model.getModel())
             this->generateModel(model);
+        if(model.getCrud())
+            this->generateCRUD(model);
+
     }
    // qDebug() << this->beans;
 }
@@ -235,8 +238,33 @@ void GeCo::generateModel(GeCoBean model)
     else
         collection->write(this->path + "/module/Application/src/Application/Model/Collection/" + model.getName() + "Collection.php");
 
+    //Generate Catalog
+    ZfCatalog *catalog = new ZfCatalog(model,this->beans);
+    catalog->generate();
+    if(!model.isDefaultModule())
+        catalog->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Catalog/" + model.getName() + "Catalog.php");
+    else
+        catalog->write(this->path + "/module/Application/src/Application/Model/Collection/" + model.getName() + "Catalog.php");
+
+    //Generate Query
+    ZfQuery *query = new ZfQuery(model,this->beans);
+    query->generate();
+    if(!model.isDefaultModule())
+        query->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Query/" + model.getName() + "Query.php");
+    else
+        query->write(this->path + "/module/Application/src/Application/Query/" + model.getName() + "Query.php");
 
 
+}
+
+void GeCo::generateCRUD(GeCoBean model)
+{
+    ZfCRUD *crud = new ZfCRUD(model, this->beans);
+    crud->generate();
+    if(!model.isDefaultModule())
+        crud->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Controller/" + model.getName() + "Controller.php");
+    else
+        crud->write(this->path + "/module/Application/src/Application/Controller/" + model.getName() + "Controller.php");
 }
 
 void GeCo::createStructure()

@@ -30,7 +30,10 @@ SOURCES += main.cpp\
     DataBase/Model/columnbean.cpp \
     ZendFramework/zfexception.cpp \
     ZendFramework/zffactory.cpp \
-    ZendFramework/zfmetadata.cpp
+    ZendFramework/zfmetadata.cpp \
+    ZendFramework/zfcatalog.cpp \
+    ZendFramework/zfcrud.cpp \
+    ZendFramework/zfquery.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -49,7 +52,10 @@ HEADERS  += mainwindow.h \
     DataBase/Model/columnbean.h \
     ZendFramework/zfexception.h \
     ZendFramework/zffactory.h \
-    ZendFramework/zfmetadata.h
+    ZendFramework/zfmetadata.h \
+    ZendFramework/zfcatalog.h \
+    ZendFramework/zfcrud.h \
+    ZendFramework/zfquery.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \
