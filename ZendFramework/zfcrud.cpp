@@ -54,10 +54,15 @@ void ZfCRUD::generate()
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
+    ColumnBean primaryKey;
+
     bool hasStatus = false;
     foreach (column, this->columns) {
         if(column.getField() == "status")
             hasStatus = true;
+
+        if(column.isPkAutoIncrement())
+            primaryKey = column;
     }
 
 
@@ -231,6 +236,70 @@ void ZfCRUD::generate()
         methodDisable.setDocblock(docblockDisable);
         this->code.addMethod(methodDisable);
     }
+
+    if(this->model.getLog())
+    {
+        GeCoBean Log;
+        Log = this->getByExntendName(this->model.getLogName());
+
+
+        //History
+        Method methodHistory;
+        Docblock History;
+        History.setShortDescription("History");
+        methodHistory.setName("historyAction");
+        methodHistory.setVisibility(Method::PUBLIC);
+        methodHistory.isStatic(false);
+        methodHistory.addBody("try {");
+        methodHistory.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
+        methodHistory.addBody("\tif(!$id" + this->model.getName() +" )");
+        methodHistory.addBody("\t\tthrow new \Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+        methodHistory.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdatper());");
+
+        methodHistory.addBody("\t$userLogQuery->whereAdd(UserLog::ID_USER, $user->getIdUser());");
+        methodHistory.addBody("\t$userLogQuery->addDescendingOrderBy(UserLog::ID_USER_LOG);");
+        methodHistory.addBody("\t$userLogs = $userLogQuery->find();");
+        methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdatper());");
+        methodHistory.addBody("\t$users = $userQuery->find();");
+        methodHistory.addBody("\t$this->view->userLogs = $userLogs;");
+        methodHistory.addBody("\t$this->view->users = $users;");
+        methodHistory.addBody("} catch (\\Exception $e) {");
+        methodHistory.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'user','action' => 'index',));");
+        methodHistory.addBody("}");
+        methodHistory.addBody("return $this->view;");
+        methodHistory.setDocblock(History);
+        this->code.addMethod(methodHistory);
+
+        //LOG
+        Method methodLog;
+        Docblock dockblockLog;
+        dockblockLog.setShortDescription("Log");
+        methodLog.setName("newLog");
+        methodLog.setVisibility(Method::PRIVATE);
+        methodLog.isStatic(false);
+        methodLog.addParam("bean", "AbstractBean");
+        methodLog.addParam("event");
+        methodLog.addParam("note = \"\"");
+
+        methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog = new " + this->model.getName() +"LogCatalog($this->getAdatper());");
+        methodLog.addBody("$date = new \\DateTime(\"now\");");
+        methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"Log = " + this->model.getName() +"LogFactory::createFromArray(array(");
+        methodLog.addBody("\t" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() + " => $bean->get" + this->ucfirst(primaryKey.getField().toUpper()) + "(),");
+        methodLog.addBody("\t" + this->model.getName() +"Log::EVENT => $event,");
+        methodLog.addBody("\t" + this->model.getName() +"Log::NOTE => $note,");
+        methodLog.addBody("\t" + this->model.getName() +"Log::TIMESTAMP => $date->format(\DateTime::W3C),");
+        methodLog.addBody("\t)");
+
+        methodLog.addBody(");");
+        methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog->save($" + this->lcFirst(this->model.getName()) +"Log);");
+        methodLog.setDocblock(dockblockLog);
+        this->code.addMethod(methodLog);
+    }
+
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Controller");
     docblock.setLongDescription("GeCo");
