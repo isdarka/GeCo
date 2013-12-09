@@ -51,6 +51,12 @@ void ZfCRUD::generate()
     this->code.addUse("BaseProject\\Controller\\BaseController");
 
 
+    this->code.addUse(this->model.getModule() + "\\Query\\" +this->model.getName() + "Query");
+    this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" +this->model.getName() + "");
+    this->code.addUse(this->model.getModule() + "\\Model\\Catalog\\" +this->model.getName() + "Catalog");
+    this->code.addUse(this->model.getModule() + "\\Model\\Factory\\" +this->model.getName() + "Factory");
+
+
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
@@ -143,7 +149,7 @@ void ZfCRUD::generate()
     methodSave.setName("saveAction");
     methodSave.setVisibility(Method::PUBLIC);
     methodSave.isStatic(false);
-    methodSave.addBody("$id" + this->model.getName() +" = $this->params()->fromPost(\"id\", 0);");
+    methodSave.addBody("$id" + this->model.getName() +" = $this->params()->fromPost(\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\", 0);");
     methodSave.addBody("if($id" + this->model.getName() +")");
     methodSave.addBody("{");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
@@ -160,7 +166,7 @@ void ZfCRUD::generate()
     methodSave.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
 
     methodSave.addBody("try {");
-    methodSave.addBody("\t" + this->model.getName() +" Factory::populate($" + this->lcFirst(this->model.getName()) +", $this->params()->fromPost());");
+    methodSave.addBody("\t" + this->model.getName() +"Factory::populate($" + this->lcFirst(this->model.getName()) +", $this->params()->fromPost());");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
     if(this->model.getLog())
         methodSave.addBody("\t($id" + this->model.getName() +")?$this->newLog($" + this->lcFirst(this->model.getName()) +", Log::UPDATED):$this->newLog($" + this->lcFirst(this->model.getName()) +", Log::CREATED);");
@@ -196,12 +202,12 @@ void ZfCRUD::generate()
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
-        methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", Log::ENABLED);");
+        methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodEnable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been enabled.');");
         methodEnable.addBody("} catch (\\Exception $e) {");
         methodEnable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"    Catalog->rollback();");
+        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodEnable.addBody("}");
         methodEnable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->model.getName().toLower() +"','action' => 'index',));");
         methodEnable.addBody("return $this->view;");
@@ -224,12 +230,12 @@ void ZfCRUD::generate()
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
-        methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", Log::DISABLE);");
+        methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodDisable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been disabled.');");
         methodDisable.addBody("} catch (\\Exception $e) {");
         methodDisable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"    Catalog->rollback();");
+        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodDisable.addBody("}");
         methodDisable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->model.getName().toLower() +"','action' => 'index',));");
         methodDisable.addBody("return $this->view;");
@@ -239,8 +245,21 @@ void ZfCRUD::generate()
 
     if(this->model.getLog())
     {
+        this->code.addUse("Model\\Bean\\AbstractBean");
+        GeCoBean parentLog;
+        parentLog = this->getByExntendName("Log");
+        this->code.addUse(parentLog.getModule() + "\\Model\\Bean\\" +parentLog.getName());
+
         GeCoBean Log;
         Log = this->getByExntendName(this->model.getLogName());
+
+
+
+
+        this->code.addUse(Log.getModule() + "\\Query\\" +Log.getName()  + "Query");
+        this->code.addUse(Log.getModule() + "\\Model\\Bean\\" +Log.getName()  + "");
+        this->code.addUse(Log.getModule() + "\\Model\\Catalog\\" +Log.getName() + "Catalog");
+        this->code.addUse(Log.getModule()+ "\\Model\\Factory\\" +Log.getName() + "Factory");
 
 
         //History
@@ -253,22 +272,31 @@ void ZfCRUD::generate()
         methodHistory.addBody("try {");
         methodHistory.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodHistory.addBody("\tif(!$id" + this->model.getName() +" )");
-        methodHistory.addBody("\t\tthrow new \Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
-        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
         methodHistory.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+
+        methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdatper());");
+        methodHistory.addBody("\t$users = $userQuery->find();");
+
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");        
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdatper());");
 
-        methodHistory.addBody("\t$userLogQuery->whereAdd(UserLog::ID_USER, $user->getIdUser());");
-        methodHistory.addBody("\t$userLogQuery->addDescendingOrderBy(UserLog::ID_USER_LOG);");
-        methodHistory.addBody("\t$userLogs = $userLogQuery->find();");
-        methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdatper());");
-        methodHistory.addBody("\t$users = $userQuery->find();");
-        methodHistory.addBody("\t$this->view->userLogs = $userLogs;");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->whereAdd(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +", $" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) +"());");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->addDescendingOrderBy(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +"_LOG );");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Logs = $" + this->lcFirst(this->model.getName()) +"LogQuery->find();");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->find();");
+
+        methodHistory.addBody("");
+        methodHistory.addBody("\t //Views");
+        methodHistory.addBody("\t$this->view->" + this->lcFirst(this->model.getName()) +"Logs = $" + this->lcFirst(this->model.getName()) +"Logs;");
+        methodHistory.addBody("\t$this->view->" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"s;");
         methodHistory.addBody("\t$this->view->users = $users;");
+
+        this->code.addUse("Core\\Query\\UserQuery");
         methodHistory.addBody("} catch (\\Exception $e) {");
         methodHistory.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'user','action' => 'index',));");
+        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->model.getName()) +"','action' => 'index',));");
         methodHistory.addBody("}");
         methodHistory.addBody("return $this->view;");
         methodHistory.setDocblock(History);
@@ -281,17 +309,19 @@ void ZfCRUD::generate()
         methodLog.setName("newLog");
         methodLog.setVisibility(Method::PRIVATE);
         methodLog.isStatic(false);
-        methodLog.addParam("bean", "AbstractBean");
+
         methodLog.addParam("event");
         methodLog.addParam("note = \"\"");
+        methodLog.addParam("bean", "AbstractBean");
 
         methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog = new " + this->model.getName() +"LogCatalog($this->getAdatper());");
         methodLog.addBody("$date = new \\DateTime(\"now\");");
         methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"Log = " + this->model.getName() +"LogFactory::createFromArray(array(");
-        methodLog.addBody("\t" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() + " => $bean->get" + this->ucfirst(primaryKey.getField().toUpper()) + "(),");
+        methodLog.addBody("\t" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() + " => $bean->get" + this->ucfirst(primaryKey.getField()) + "(),");
+        methodLog.addBody("\t" + this->model.getName() +"Log::ID_USER => $this->getUser()->getIdUser(),");
         methodLog.addBody("\t" + this->model.getName() +"Log::EVENT => $event,");
         methodLog.addBody("\t" + this->model.getName() +"Log::NOTE => $note,");
-        methodLog.addBody("\t" + this->model.getName() +"Log::TIMESTAMP => $date->format(\DateTime::W3C),");
+        methodLog.addBody("\t" + this->model.getName() +"Log::TIMESTAMP => $date->format(\\DateTime::W3C),");
         methodLog.addBody("\t)");
 
         methodLog.addBody(");");

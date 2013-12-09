@@ -169,6 +169,17 @@ bool ColumnBean::isNumber()
         return true;
     if(this->type.toUpper().mid(0,6) == "BIGINT")
         return true;
+//    if(this->type.toUpper().mid(0,5) == "FLOAT")
+//        return true;
+//    if(this->type.toUpper().mid(0,6) == "DOUBLE")
+//        return true;
+//    if(this->type.toUpper().mid(0,7) == "DECIMAL")
+//        return true;
+    return false;
+}
+
+bool ColumnBean::isFloat()
+{
     if(this->type.toUpper().mid(0,5) == "FLOAT")
         return true;
     if(this->type.toUpper().mid(0,6) == "DOUBLE")

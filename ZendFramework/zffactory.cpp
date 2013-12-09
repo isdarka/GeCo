@@ -45,12 +45,18 @@ void ZfFactory::generate()
 
     GeCoBean extra;
     this->code.setClassName(this->model.getName() + "Factory");
+
+    this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" + this->model.getName());
     if(!this->model.getExtend().isEmpty())
     {
         extra = this->getByExntendName(this->model.getExtend());
         this->code.setExtends(extra.getName() + "Factory");
-    }else
+        this->code.addUse(extra.getModule() + "\\Model\\Factory\\" + extra.getName() + "Factory");
+    }else{
         this->code.setExtends("AbstractFactory");
+        this->code.addUse("Model\\Factory\\AbstractFactory");
+    }
+
 
 
     Method methodCreateFromArray;
@@ -60,7 +66,7 @@ void ZfFactory::generate()
     methodCreateFromArray.setName("createFromArray");
     methodCreateFromArray.setVisibility(Method::PUBLIC);
     methodCreateFromArray.isStatic(true);
-    methodCreateFromArray.addParam("fields","array");
+    methodCreateFromArray.addParam("fields");
     methodCreateFromArray.addBody("$" + this->lcFirst(this->model.getName()) + " = new " + this->model.getName() + "();");
     methodCreateFromArray.addBody("self::populate($" + this->lcFirst(this->model.getName()) + ",$fields);");
     methodCreateFromArray.addBody("return $" + this->lcFirst(this->model.getName()) + ";");

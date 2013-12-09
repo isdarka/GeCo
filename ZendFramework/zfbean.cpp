@@ -43,6 +43,7 @@ void ZfBean::generate()
 {
 
     GeCoBean extra;
+    bool hasStatus = false;
     this->code.setClassName(this->model.getName());
     if(!this->model.getExtend().isEmpty())
     {
@@ -64,6 +65,8 @@ void ZfBean::generate()
     properties.setDefaultValue(this->model.getTable());
     this->code.addPropertie(properties);
     foreach (column, this->columns) {
+        if(column.getField() == "status")
+            hasStatus = true;
 //        qDebug() << column.getField();
 //        qDebug() << column.getDefault();
         Propertie properties;        
@@ -74,6 +77,20 @@ void ZfBean::generate()
         this->code.addPropertie(properties);
     }
 
+    if(hasStatus)
+    {
+        Propertie enable;
+        enable.setName("ENABLE");
+        enable.isConst(true);
+        enable.setDefaultValue("1");
+        this->code.addPropertie(enable);
+
+        Propertie disable;
+        disable.setName("DISABLE");
+        disable.isConst(true);
+        disable.setDefaultValue("2");
+        this->code.addPropertie(disable);
+    }
     //PRIVATES
     ColumnBean primaryKey;
     foreach (column, this->columns) {
@@ -101,7 +118,7 @@ void ZfBean::generate()
 
     method.setName("getIndex");
     method.setVisibility(Method::PUBLIC);
-    method.addBody("return $this->" + this->ucfirst(primaryKey.getField()) + ";");
+    method.addBody("return $this->" + this->lcFirst(this->ucfirst(primaryKey.getField())) + ";");
     method.setDocblock(docblockIndex);
     this->code.addMethod(method);
 
@@ -206,6 +223,56 @@ void ZfBean::generate()
 
        }
 
+       if(hasStatus)
+       {
+
+           Method statuses;
+           Docblock docblockStatuses;
+           docblockStatuses.setShortDescription("Statuses");
+
+           statuses.setName("$statuses");
+           statuses.setVisibility(Method::PUBLIC);
+           statuses.isStatic(true);
+           statuses.isFunction(false);
+           statuses.addParam("self::ENABLE => \"Enable\"");
+           statuses.addParam("self::DISABLE => \"Disable\"");
+           statuses.addBody("");
+           statuses.setDocblock(docblockStatuses);
+           this->code.addMethod(statuses);
+
+           Method enable;
+           Docblock docblockenable;
+           docblockenable.setShortDescription(this->lcFirst(this->ucfirst(primaryKey.getField())) + " is enable");
+           docblockenable.addTag("return","boolean");
+
+           enable.setName("isEnabled");
+           enable.setVisibility(Method::PUBLIC);
+           enable.addBody("return self::ENABLE == $this->getStatus();");
+           enable.setDocblock(docblockenable);
+           this->code.addMethod(enable);
+
+           Method disable;
+           Docblock docblockDisable;
+           docblockDisable.setShortDescription(this->lcFirst(this->ucfirst(primaryKey.getField())) + " is disable");
+           docblockDisable.addTag("return","boolean");
+
+           disable.setName("isDisabled");
+           disable.setVisibility(Method::PUBLIC);
+           disable.addBody("return self::DISABLE == $this->getStatus();");
+           disable.setDocblock(docblockDisable);
+           this->code.addMethod(disable);
+
+           Method statusName;
+           Docblock docblockStatusName;
+           docblockStatusName.setShortDescription("Get Status Name");
+           docblockStatusName.addTag("return","string");
+
+           statusName.setName("getStatusString");
+           statusName.setVisibility(Method::PUBLIC);
+           statusName.addBody("return self::$statuses[$this->getStatus()];");
+           statusName.setDocblock(docblockStatusName);
+           this->code.addMethod(statusName);
+       }
 }
 
 GeCoBean ZfBean::getByExntendName(QString extend)

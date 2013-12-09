@@ -19,6 +19,8 @@ public:
     void setDocblock(Docblock docblock);
     void isStatic(bool boolean);
     bool getIsStatic();
+    void isFunction(bool boolean);
+    bool getIsFunction();
 private:
     QString name;
     QStringList params;
@@ -30,6 +32,7 @@ private:
     QString visibility;
     Docblock docblock;
     bool methodStatic = false;
+    bool methodFunction = true;
 };
 
 #endif // METHOD_H

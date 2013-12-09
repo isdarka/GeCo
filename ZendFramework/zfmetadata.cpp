@@ -53,7 +53,7 @@ void ZfMetadata::generate()
         this->code.setExtends("AbstractMetadata");
 
 
-
+    this->code.addUse("Model\\Bean\\AbstractBean");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
@@ -106,7 +106,7 @@ void ZfMetadata::generate()
     methodEntityName.setName("getEntityName");
     methodEntityName.setVisibility(Method::PUBLIC);
     methodEntityName.isStatic(false);
-    methodEntityName.addBody("return \"" + this->model.getTable() +"\";");
+    methodEntityName.addBody("return \"" + this->model.getName() +"\";");
     methodEntityName.setDocblock(docblockEntityName);
     this->code.addMethod(methodEntityName);
 
@@ -118,7 +118,7 @@ void ZfMetadata::generate()
     methodTableName.setName("getTableName");
     methodTableName.setVisibility(Method::PUBLIC);
     methodTableName.isStatic(false);
-    methodTableName.addBody("return \"" + this->model.getName() +"\";");
+    methodTableName.addBody("return \"" + this->model.getTable() +"\";");
     methodTableName.setDocblock(docblockTableName);
     this->code.addMethod(methodTableName);
 
@@ -179,7 +179,7 @@ void ZfMetadata::generate()
 
     this->code.setNamespace(this->model.getModule() + "\\Model\\Metadata");
     this->code.addUse("Model\\Metadata\\AbstractMetadata");
-    if(this->model.getExtend().isEmpty())
+    if(this->model.isDefaultModule())
     {
         this->code.addUse("Application\\Model\\Bean\\" + this->model.getName());
         this->code.addUse("Application\\Model\\Factory\\" + this->model.getName() + "Factory");

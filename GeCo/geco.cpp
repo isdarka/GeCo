@@ -265,6 +265,33 @@ void GeCo::generateCRUD(GeCoBean model)
         crud->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Controller/" + model.getName() + "Controller.php");
     else
         crud->write(this->path + "/module/Application/src/Application/Controller/" + model.getName() + "Controller.php");
+
+    QDir viewDirectory(this->path + "/module/Application/view/" + model.getModule().toLower());
+    if(!model.isDefaultModule())
+        viewDirectory.setPath(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+
+
+    if (!viewDirectory.exists())
+        viewDirectory.mkdir(viewDirectory.path());
+
+
+    ZfView *view = new ZfView(model, this->beans);
+//    view->generate();
+    if(!model.isDefaultModule())
+        view->writeIndex(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+    else
+        view->writeIndex(this->path + "/module/Application/src/Application/view/application");
+
+    if(!model.isDefaultModule())
+        view->writeForm(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+    else
+        view->writeForm(this->path + "/module/Application/src/Application/view/application");
+
+    if(!model.isDefaultModule())
+        view->writeHistory(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+    else
+        view->writeHistory(this->path + "/module/Application/src/Application/view/application");
+
 }
 
 void GeCo::createStructure()
@@ -316,7 +343,9 @@ void GeCo::createStructure()
 
             if (!module.exists())
                 module.mkdir(module.path());
-
+            module.setPath(currentModule.path().append("/").append(view.path()).append("/").append(beanModel.getModule().toLower()));
+            if (!module.exists())
+                module.mkdir(module.path());
 
             if (!moduleSrc.exists())
                 moduleSrc.mkdir(moduleSrc.path());
