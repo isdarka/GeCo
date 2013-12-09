@@ -106,7 +106,6 @@ void ZfCatalog::generate()
         methodCreate.addBody("\t));");
         methodCreate.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
         methodCreate.addBody("\tthrow $e;");
-        methodCreate.addBody("}");
         methodCreate.addBody("} catch (" + this->model.getName() + "Exception $e) {");
         methodCreate.addBody("\tthrow $e;");
         methodCreate.addBody("}");
@@ -117,7 +116,7 @@ void ZfCatalog::generate()
         Method methodUpdate;
         Docblock docblockUpdate;
         docblockUpdate.setShortDescription("Update " + this->model.getName() + "");
-        methodUpdate.setName("create");
+        methodUpdate.setName("update");
         methodUpdate.addParam("bean", "AbstractBean");
         methodUpdate.setVisibility(Method::PROTECTED);
         methodUpdate.isStatic(false);
@@ -136,7 +135,6 @@ void ZfCatalog::generate()
 
         methodUpdate.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
         methodUpdate.addBody("\tthrow $e;");
-        methodUpdate.addBody("}");
         methodUpdate.addBody("} catch (" + this->model.getName() + "Exception $e) {");
         methodUpdate.addBody("\tthrow $e;");
         methodUpdate.addBody("}");

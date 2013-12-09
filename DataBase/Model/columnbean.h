@@ -25,6 +25,7 @@ public:
     bool isText();
     bool isLongText();
     bool isNumber();
+    bool isFloat();
     bool isPrimaryKey();
     bool isForeingKey();
     bool isUnique();

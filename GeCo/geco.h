@@ -16,6 +16,7 @@
 #include "ZendFramework/zfcatalog.h"
 #include "ZendFramework/zfcrud.h"
 #include "ZendFramework/zfquery.h"
+#include "ZendFramework/zfview.h"
 
 class GeCo
 {

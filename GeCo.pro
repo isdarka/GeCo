@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     ZendFramework/zfmetadata.cpp \
     ZendFramework/zfcatalog.cpp \
     ZendFramework/zfcrud.cpp \
-    ZendFramework/zfquery.cpp
+    ZendFramework/zfquery.cpp \
+    ZendFramework/zfview.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -55,7 +56,8 @@ HEADERS  += mainwindow.h \
     ZendFramework/zfmetadata.h \
     ZendFramework/zfcatalog.h \
     ZendFramework/zfcrud.h \
-    ZendFramework/zfquery.h
+    ZendFramework/zfquery.h \
+    ZendFramework/zfview.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \
