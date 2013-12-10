@@ -57,8 +57,16 @@ void ZfCollection::generate()
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
+    ColumnBean primaryKey;
 
+    bool hasName = false;
     foreach (column, this->columns) {
+
+        if(column.getField() == "name")
+            hasName = true;
+
+        if(column.isPkAutoIncrement())
+            primaryKey = column;
         if(column.isForeingKey()){
             Method method;
             Docblock docblock;
@@ -90,26 +98,28 @@ void ZfCollection::generate()
             methodGetBy.addBody("return $" + this->lcFirst(this->model.getName()) + "Collection;");
             methodGetBy.setDocblock(docblockGetBy);
             this->code.addMethod(methodGetBy);
+            this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + "");
         }
     }
 
-//    public function getAlgoIds()
-//        {
-//            return $this->map(function(Action $action){
-//                return array($action->getIdController() => $action->getIdController());
-//            });
-//        }
 
-//        public function getByIdController($idController)
-//        {
-//            $actionCollection = new ActionCollection();
-//            $this->each(function(Action $action) use ($idController, $actionCollection){
-//                if($action->getIdController() == $idController)
-//                    $actionCollection->append($action);
-//            });
+    if(hasName)
+    {
+        Method methodToCombo;
+        Docblock docblockToCombo;
+        docblockToCombo.addTag("return", "array");
 
-//            return $actionCollection;
-//        }
+        methodToCombo.setName("toCombo");
+        methodToCombo.setVisibility(Method::PUBLIC);
+        methodToCombo.addBody("return $this->map(function(" + this->model.getName() + " $" + this->lcFirst(this->model.getName()) + "){");
+        methodToCombo.addBody("\treturn array( $" + this->lcFirst(this->model.getName()) + "->get" + this->lcFirst(this->ucfirst(primaryKey.getField())) + "() => $" + this->lcFirst(this->model.getName()) + "->getName() );");
+        methodToCombo.addBody("});");
+        methodToCombo.setDocblock(docblockToCombo);
+        this->code.addMethod(methodToCombo);
+    }
+
+
+
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Bean");
     docblock.setLongDescription("GeCo");

@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QFile>
+#include <QSqlQuery>
 
 class ZfCatalog
 {

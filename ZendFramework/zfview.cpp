@@ -45,16 +45,34 @@ QString ZfView::generateIndex()
     QString index;
 
     index.append("<fieldset>\n");
-    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")}</legend>\n");
+    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")} <a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate(\"New " + this->model.getName() +"\")}</a></legend>\n");
         index.append("\t<div class=\"table-responsive\">\n");
+        index.append("\t<form action=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/index\" method=\"get\">\n");
+
             index.append("\t\t<table class=\"table table-bordered table-condensed table-hover\">\n");
 
                 index.append("\t").append("\t").append("\t").append("<thead>").append("\n");
+
+
+                    //FILTER
                     index.append("\t").append("\t").append("\t").append("\t").append("<tr class=\"well\">").append("\n");
 
                     TableCatalog t;
                     this->columns = t.getColumnsByTable(this->model.getTable());
                     ColumnBean column;
+//                    bool hasStatus = false;
+                    foreach (column, this->columns) {
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th><input type=\"text\" class=\"form-control\" name=\"" + column.getField() + "\" placeholder=\"{$i18n->translate('" + column.getField().toUpper() + "')}\" value=\"{$queryParams['" + column.getField() + "']}\"></th>").append("\n");
+                    }
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-default \">{$i18n->translate(\"Filter\")}</button></th>").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("</tr>").append("\n");
+
+                //END FILTER
+                    index.append("\t").append("\t").append("\t").append("\t").append("<tr class=\"well\">").append("\n");
+
+//                    TableCatalog t;
+//                    this->columns = t.getColumnsByTable(this->model.getTable());
+//                    ColumnBean column;
                     bool hasStatus = false;
                     foreach (column, this->columns) {
                         if(column.getField() == "status")
@@ -129,6 +147,8 @@ QString ZfView::generateIndex()
                 index.append("\t").append("\t").append("\t").append("</tbody>").append("\n");
 
             index.append("\t\t</table>\n");
+            index.append("\t\t</form>\n");
+
         index.append("\t</div>\n");
     index.append("</fieldset>\n");
 
@@ -156,7 +176,7 @@ QString ZfView::generateForm()
     index.append("<fieldset>\n");
     index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")}</legend>\n");
     index.append("\t<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->model.getName().toLower() + "/save\">\n");
-    index.append("\t\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(primaryKey.getField()) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
+    index.append("\t\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
     foreach (column, this->columns) {
         if(column.getField() != primaryKey.getField())
         {
@@ -168,17 +188,17 @@ QString ZfView::generateForm()
                 index.append("\t\t\t").append("<div class=\"col-sm-10\">").append("\n");
 
                 if(column.isDate())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 else if (column.isNumber())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isFloat())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isTime())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isLongText())
-                    index.append("\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
+                    index.append("\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
                 else
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(column.getField()) + "\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 index.append("\t\t\t").append("</div>").append("\n");
                 index.append("\t\t</div>").append("\n");
 
@@ -246,6 +266,7 @@ QString ZfView::generateHistory()
     index.append("\t\t\t</tbody>").append("\n");
     index.append("\t\t</table>").append("\n");
     index.append("\t</div>").append("\n");
+    index.append("\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->model.getName().toLower() + " action=index}\" class=\"btn btn-default\">{$i18n->translate('Go Back')}</a>").append("\n");
     index.append("</fieldset>\n");
 
     return index;

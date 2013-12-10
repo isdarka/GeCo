@@ -130,11 +130,11 @@ void ZfBean::generate()
         Docblock docblock;
         docblock.setShortDescription("Set the " + this->lcFirst(this->ucfirst(column.getField())) + " property");
         if(column.isDate())
-            docblock.addTag("param","Zend_Date $" + this->lcFirst(this->ucfirst(column.getField())));
+            docblock.addTag("param","$" + this->lcFirst(this->ucfirst(column.getField())));
         else if(column.isNumber())
             docblock.addTag("param","int $" + this->lcFirst(this->ucfirst(column.getField())));
         else if(column.isTime())
-            docblock.addTag("param","Zend_Date $" + this->lcFirst(this->ucfirst(column.getField())));
+            docblock.addTag("param","$" + this->lcFirst(this->ucfirst(column.getField())));
         else if(column.isLongText())
             docblock.addTag("param","string $" + this->lcFirst(this->ucfirst(column.getField())));
         else if(column.isText())
@@ -145,11 +145,11 @@ void ZfBean::generate()
         method.setDocblock(docblock);
         method.setName("set" + (this->ucfirst(column.getField())));
         method.setVisibility(Method::PUBLIC);
-        if(column.isDate())
-            method.addParam(this->lcFirst(this->ucfirst(column.getField())),"Zend_Date");
-        else if(column.isTime())
-            method.addParam(this->lcFirst(this->ucfirst(column.getField())),"Zend_Date");
-        else
+//        if(column.isDate())
+//            method.addParam(this->lcFirst(this->ucfirst(column.getField())),"Zend_Date");
+//        else if(column.isTime())
+//            method.addParam(this->lcFirst(this->ucfirst(column.getField())),"Zend_Date");
+//        else
             method.addParam(this->lcFirst(this->ucfirst(column.getField())));
 
         method.addBody("$this->" + this->lcFirst(this->ucfirst(column.getField())) + " = $" + this->lcFirst(this->ucfirst(column.getField())) + ";");

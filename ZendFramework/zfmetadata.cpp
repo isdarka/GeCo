@@ -163,6 +163,16 @@ void ZfMetadata::generate()
     this->code.addMethod(methodNewCollection);
 
 
+    Method methodNewBean;
+    Docblock docblockNewBean;
+    docblockNewBean.setShortDescription("Get Bean");
+    docblockNewBean.addTag("return", this->model.getName() + "");
+    methodNewBean.setName("newBean");
+    methodNewBean.setVisibility(Method::PUBLIC);
+    methodNewBean.isStatic(false);
+    methodNewBean.addBody("return new " + this->model.getName() +"();");
+    methodNewBean.setDocblock(docblockNewBean);
+    this->code.addMethod(methodNewBean);
 
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Bean");

@@ -125,8 +125,7 @@ void ZfCRUD::generate()
     methodUpdate.addBody("");
     methodUpdate.addBody("\t//Views");
     methodUpdate.addBody("\t$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
-    methodUpdate.addBody("\t$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/form.tpl\");");
-    methodUpdate.addBody("\treturn $this->view;");
+    //methodUpdate.addBody("\treturn $this->view;");
     methodUpdate.addBody("} catch (\\Exception $e) {");
     methodUpdate.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
     methodUpdate.addBody("\t$this->redirect()->toRoute(null, array(");

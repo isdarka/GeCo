@@ -143,6 +143,123 @@ void ZfCatalog::generate()
     }
 
 
+    //RELATIONS
+    QString relation;
+    bool hasRelations = false;
+    foreach (relation, this->model.getRelations()) {
+        hasRelations = true;
+        QString tmp = relation;
+        relation.replace(this->model.getName().toLower(), "");
+        relation.replace(this->model.getModule().toLower(), "");
+        relation.replace("_s", "");
+        relation.replace("_", "");
+        relation = relation.mid(0, relation.size() - 1);
+
+        QSqlQuery query;
+        QStringList fields;
+        query.exec("DESC " + tmp);
+
+
+        while(query.next()) {
+            fields.append(query.value(0).toString());
+        }
+
+        QString field;
+
+        Method linkTo;
+        QString fieldRelation;
+        Docblock docblockLinkTo;
+        docblockLinkTo.setShortDescription("Link to " + this->ucfirst(relation));
+        linkTo.setName("linkTo"+ this->ucfirst(relation));
+        linkTo.setVisibility(Method::PUBLIC);
+        foreach (field, fields) {
+            if(field != primaryKey.getField())
+                fieldRelation = field;
+
+            linkTo.addParam(this->lcFirst(this->ucfirst(field)));
+        }
+
+        linkTo.isStatic(false);
+        linkTo.addBody("try {");
+        linkTo.addBody("\t$this->insert = $this->sql->insert('" + tmp + "');");
+        linkTo.addBody("\t$this->insert->values(array(");
+
+        foreach (field, fields) {
+            linkTo.addBody("\t\t'" + field + "' => $" + this->lcFirst(this->ucfirst(field)) + ",");
+        }
+
+        linkTo.addBody("\t));");
+        linkTo.addBody("\t$this->execute($this->insert);");
+        linkTo.addBody("}catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
+        linkTo.addBody("\tthrow $e;");
+        linkTo.addBody("} catch (\\Exception $e) {");
+        linkTo.addBody("\tthrow $e;");
+        linkTo.addBody("}");
+        linkTo.setDocblock(docblockLinkTo);
+        this->code.addMethod(linkTo);
+
+        Method unlinkFrom;
+        Docblock docblockUnlinkFrom;
+        docblockUnlinkFrom.setShortDescription("Unlink from " + this->model.getName());
+        unlinkFrom.setName("unlinkFrom"+ this->ucfirst(relation));
+        unlinkFrom.setVisibility(Method::PUBLIC);
+        foreach (field, fields) {
+            unlinkFrom.addParam(this->lcFirst(this->ucfirst(field)));
+        }
+
+        unlinkFrom.isStatic(false);
+        unlinkFrom.addBody("try {");
+        unlinkFrom.addBody("\t$this->delete = $this->sql->delete('" + tmp + "');");
+        unlinkFrom.addBody("\t$where = new Where();");
+
+        foreach (field, fields) {
+            unlinkFrom.addBody("\t$where->equalTo('" + field + "', $" + this->lcFirst(this->ucfirst(field)) + ");");
+        }
+
+        unlinkFrom.addBody("\t$this->delete->where($where);");
+        unlinkFrom.addBody("\t$this->execute($this->delete);");
+        unlinkFrom.addBody("}catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
+        unlinkFrom.addBody("\tthrow $e;");
+        unlinkFrom.addBody("} catch (\\Exception $e) {");
+        unlinkFrom.addBody("\tthrow $e;");
+        unlinkFrom.addBody("}");
+        unlinkFrom.setDocblock(docblockUnlinkFrom);
+        this->code.addMethod(unlinkFrom);
+
+
+        Method unlinkAll;
+        Docblock docblockUnlinkAll;
+        docblockUnlinkAll.setShortDescription("Unlink all " + this->model.getName());
+        unlinkAll.setName("unlinkAll"+ this->ucfirst(relation));
+        unlinkAll.setVisibility(Method::PUBLIC);
+
+            unlinkAll.addParam(this->lcFirst(this->ucfirst(fieldRelation)));
+
+
+        unlinkAll.isStatic(false);
+        unlinkAll.addBody("try {");
+        unlinkAll.addBody("\t$this->delete = $this->sql->delete('" + tmp + "');");
+        unlinkAll.addBody("\t$where = new Where();");
+
+
+            unlinkAll.addBody("\t$where->equalTo('" + fieldRelation + "', $" + this->lcFirst(this->ucfirst(fieldRelation)) + ");");
+
+
+        unlinkAll.addBody("\t$this->delete->where($where);");
+        unlinkAll.addBody("\t$this->execute($this->delete);");
+        unlinkAll.addBody("}catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
+        unlinkAll.addBody("\tthrow $e;");
+        unlinkAll.addBody("} catch (\\Exception $e) {");
+        unlinkAll.addBody("\tthrow $e;");
+        unlinkAll.addBody("}");
+        unlinkAll.setDocblock(docblockUnlinkAll);
+        this->code.addMethod(unlinkAll);
+
+    }
+
+    if(hasRelations)
+        this->code.addUse("Zend\\Db\\Sql\\Where");
+    // /RELATIONS
 
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Catalog");
