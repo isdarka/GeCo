@@ -51,7 +51,7 @@ void ZfFactory::generate()
     {
         extra = this->getByExntendName(this->model.getExtend());
         this->code.setExtends(extra.getName() + "Factory");
-        this->code.addUse(extra.getModule() + "\\Model\\Factory\\" + extra.getName() + "Factory");
+        //this->code.addUse(extra.getModule() + "\\Model\\Factory\\" + extra.getName() + "Factory");
     }else{
         this->code.setExtends("AbstractFactory");
         this->code.addUse("Model\\Factory\\AbstractFactory");

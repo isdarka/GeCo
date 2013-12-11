@@ -59,7 +59,7 @@ void ZfCatalog::generate(QString prefixString)
     {
         extra = this->getByExntendName(this->model.getExtend());
         this->code.setExtends(extra.getName() + "Catalog");
-        this->code.addUse(extra.getModule() + "\\Model\\Catalog\\" + extra.getName() + "Catalog");
+       // this->code.addUse(extra.getModule() + "\\Model\\Catalog\\" + extra.getName() + "Catalog");
     }else{
         this->code.setExtends("AbstractCatalog");
         this->code.addUse("Model\\Catalog\\AbstractCatalog");

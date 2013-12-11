@@ -53,7 +53,7 @@ void ZfCollection::generate()
     }else
         this->code.setExtends("AbstractCollection");
 
-
+    this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + "");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
@@ -98,7 +98,7 @@ void ZfCollection::generate()
             methodGetBy.addBody("return $" + this->lcFirst(this->model.getName()) + "Collection;");
             methodGetBy.setDocblock(docblockGetBy);
             this->code.addMethod(methodGetBy);
-            this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + "");
+
         }
     }
 
