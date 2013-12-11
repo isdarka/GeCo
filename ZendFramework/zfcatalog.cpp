@@ -122,7 +122,7 @@ void ZfCatalog::generate(QString prefixString)
         methodUpdate.isStatic(false);
         methodUpdate.addBody("try {");
         if(!this->model.getExtend().isEmpty())
-            methodUpdate.addBody("\tparent::create($bean);");
+            methodUpdate.addBody("\tparent::update($bean);");
         methodUpdate.addBody("\t$this->update = $this->sql->update(self::getMetadata()->getTableName());");
         methodUpdate.addBody("\t$data = self::getMetadata()->toUpdateArray($bean);");
         methodUpdate.addBody("\t$data = array_filter($data, array($this, 'isNotNull'));");

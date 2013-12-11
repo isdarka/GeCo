@@ -106,7 +106,7 @@ void ZfCRUD::generate()
     methodCreate.addBody("$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
     methodCreate.addBody("");
     methodCreate.addBody("//Views");
-    methodCreate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
+    methodCreate.addBody("$this->view->setTemplate(\"" + this->lcFirst(this->ucfirst(this->model.getModule())).replace(exp, "-\\1").toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
     methodCreate.addBody("return $this->view;");
     methodCreate.setDocblock(docblockCreate);
     this->code.addMethod(methodCreate);
@@ -137,7 +137,7 @@ void ZfCRUD::generate()
     methodUpdate.addBody("}");
 
     methodUpdate.addBody("//Views");
-    methodUpdate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
+    methodUpdate.addBody("$this->view->setTemplate(\"" + this->lcFirst(this->ucfirst(this->model.getModule())).replace(exp, "-\\1").toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
     methodUpdate.addBody("return $this->view;");
     methodUpdate.setDocblock(docblockUpdate);
     this->code.addMethod(methodUpdate);
