@@ -18,7 +18,7 @@ class ZfQuery
 public:
     ZfQuery(GeCoBean model, QVector<GeCoBean> models);
 
-    void generate();
+    void generate(QString prefixString);
     void write(QString str);
 private:
     GeCoBean getByExntendName(QString extend);

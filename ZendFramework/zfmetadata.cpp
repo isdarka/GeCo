@@ -99,6 +99,21 @@ void ZfMetadata::generate()
     this->code.addMethod(methodToCreateArray);
 
 
+    Method methodGetFields;
+    Docblock docblockGetFields;
+    docblockGetFields.setShortDescription("Get fields");
+    methodGetFields.setName("getFields");
+    methodGetFields.setVisibility(Method::PUBLIC);
+    methodGetFields.isStatic(false);
+
+    methodGetFields.addBody("return array(");
+    foreach (column, this->columns) {
+            methodGetFields.addBody("\t" + this->model.getName() +"::" + column.getField().toUpper() + ",");
+    }
+    methodGetFields.addBody(");");
+    methodGetFields.setDocblock(docblockGetFields);
+    this->code.addMethod(methodGetFields);
+
     Method methodEntityName;
     Docblock docblockEntityName;
     docblockEntityName.setShortDescription("Get Entity Name");

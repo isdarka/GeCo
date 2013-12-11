@@ -39,9 +39,9 @@ QString ZfQuery::lcFirst(QString str)
     return tokens.join("");
 }
 
-void ZfQuery::generate()
+void ZfQuery::generate(QString prefixString)
 {
-
+    QStringList prefixes = prefixString.split(",");
     GeCoBean extra;
     this->code.setClassName(this->model.getName() + "Query");
     if(!this->model.getExtend().isEmpty())
@@ -51,28 +51,43 @@ void ZfQuery::generate()
     this->code.addUse("Query\\Query");
     this->code.addUse(this->model.getModule() + "\\Model\\Metadata\\" + this->model.getName() + "Metadata");
 
+
+
+
+
+        //RELATIONS
+    QRegExp exp("([A-Z])");
     QString relation;
     foreach (relation, this->model.getRelations()) {
-        QString tmp = relation;
+        if(!relation.isEmpty())
+        {
+            QString tmp = relation;
+            relation.replace(this->model.getName().replace(exp, "_\\1").append("s").toLower(), "");
+            relation.replace(this->model.getName().replace(exp, "_\\1").toLower(), "");
+            relation.replace(this->model.getModule().toLower(), "");
+            QString prefix;
+            foreach (prefix, prefixes) {
+                relation.replace(prefix, "", Qt::CaseInsensitive);
+            }
 
-        relation.replace(this->model.getName().toLower(), "");
-        relation.replace(this->model.getModule().toLower(), "");
-        relation.replace("_s", "");
-        relation.replace("_", "");
-        relation = relation.mid(0, relation.size() - 1);
+            relation.replace("_s", "");
+            relation.replace("s_", "");
+            relation.replace("_", "");
+            relation = relation.mid(0, relation.size() - 1);
 
-        Method methodJoin;
-        Docblock docblockJoin;
-        docblockJoin.setShortDescription("Inner Join " + this->ucfirst(relation));
-        methodJoin.setName("innerJoin"+ this->ucfirst(relation));
-        methodJoin.setVisibility(Method::PUBLIC);
-        methodJoin.isStatic(false);
-        methodJoin.addBody("$this->join(\""+ tmp +"\",");
-        methodJoin.addBody("\t\""+ tmp +".\".$this->metadata->getPrimaryKey().\"=\".");
-        methodJoin.addBody("\t$this->metadata->getEntityName().\".\".$this->metadata->getPrimaryKey());");
-        methodJoin.addBody("return $this;");
-        methodJoin.setDocblock(docblockJoin);
-        this->code.addMethod(methodJoin);
+            Method methodJoin;
+            Docblock docblockJoin;
+            docblockJoin.setShortDescription("Inner Join " + this->ucfirst(relation));
+            methodJoin.setName("innerJoin"+ this->ucfirst(relation));
+            methodJoin.setVisibility(Method::PUBLIC);
+            methodJoin.isStatic(false);
+            methodJoin.addBody("$this->join(\""+ tmp +"\",");
+            methodJoin.addBody("\t\""+ tmp +".\".$this->metadata->getPrimaryKey().\"=\".");
+            methodJoin.addBody("\t$this->metadata->getEntityName().\".\".$this->metadata->getPrimaryKey());");
+            methodJoin.addBody("return $this;");
+            methodJoin.setDocblock(docblockJoin);
+            this->code.addMethod(methodJoin);
+        }
     }
     Method methodConstruct;
     Docblock docblockConstruct;

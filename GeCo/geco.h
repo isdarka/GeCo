@@ -31,6 +31,9 @@ public:
     void generateCRUD(GeCoBean model);
 private:
     QString camelCase(QString str);
+    QString ucfirst(QString str);
+    QString lcFirst(QString str);
+
     QStringList prefixes;
     QDomDocument getDefault();    
     void createStructure();

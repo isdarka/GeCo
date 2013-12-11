@@ -43,11 +43,17 @@ QString ZfView::lcFirst(QString str)
 QString ZfView::generateIndex()
 {
     QString index;
-
+    QRegExp exp("([A-Z])");
+    QString allow ;
+    allow = this->model.getModule().toLower().append("\\").append("controller").append("\\").append(this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()).append("::");
     index.append("<fieldset>\n");
-    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")} <a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate(\"New " + this->model.getName() +"\")}</a></legend>\n");
+    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")} ").append("\n");
+    index.append("\t").append("\t").append("{if \"" + allow + "create\"|isAllowed}").append("\n");
+    index.append("\t\t\t<a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate(\"New " + this->model.getName() +"\")}</a>\n");
+    index.append("\t").append("\t").append("{/if}").append("\n");
+    index.append("\t</legend>").append("\n");
         index.append("\t<div class=\"table-responsive\">\n");
-        index.append("\t<form action=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/index\" method=\"get\">\n");
+        index.append("\t<form action=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/index\" method=\"get\">\n");
 
             index.append("\t\t<table class=\"table table-bordered table-condensed table-hover\">\n");
 
@@ -64,7 +70,7 @@ QString ZfView::generateIndex()
                     foreach (column, this->columns) {
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th><input type=\"text\" class=\"form-control\" name=\"" + column.getField() + "\" placeholder=\"{$i18n->translate('" + column.getField().toUpper() + "')}\" value=\"{$queryParams['" + column.getField() + "']}\"></th>").append("\n");
                     }
-                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-default \">{$i18n->translate(\"Filter\")}</button></th>").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-primary \">{$i18n->translate(\"Filter\")}</button></th>").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("</tr>").append("\n");
 
                 //END FILTER
@@ -102,9 +108,14 @@ QString ZfView::generateIndex()
 //Actions
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<td>").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("<div class=\"btn-group\">").append("\n");
+
+
+                    //{if "Core\Controller\Role::update"|isAllowed}
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if \"" + allow + "update\"|isAllowed}").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                            .append("<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->model.getName().toLower()  +" action=update id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
+                            .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=update id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
                             .append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
 //<a href="{url module=core controller=user action=update idUser=$user->getIdUser()}" class="btn btn-default" data-toggle="tooltip" title="{$i18n->translate('Edit')}"><span class="fa fa-pencil"></span></a>
 
                     if(hasStatus)
@@ -112,19 +123,19 @@ QString ZfView::generateIndex()
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
                                 .append("{if $" + this->lcFirst(this->model.getName()) + "->isEnabled()}")
                                 .append("\n");
-
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if \"" + allow + "disable\"|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->model.getName().toLower()  +" action=disable id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Disable')}\"><span class=\"fa fa-times-circle-o\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=disable id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Disable')}\"><span class=\"fa fa-times-circle-o\"></span></a>")
                                 .append("\n");
-
+                        index.append("\t").append("\t\t\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
                                 .append("{else if $" + this->lcFirst(this->model.getName()) + "->isDisabled()}")
                                 .append("\n");
-
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if \"" + allow + "enable\"|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->model.getName().toLower()  +" action=enable id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Enable')}\"><span class=\"fa fa-check-circle-o\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=enable id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Enable')}\"><span class=\"fa fa-check-circle-o\"></span></a>")
                                 .append("\n");
-
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{/if}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
                                 .append("{/if}")
                                 .append("\n");
@@ -132,9 +143,11 @@ QString ZfView::generateIndex()
 
                     if(this->model.getLog())
                     {
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if \"" + allow + "history\"|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->model.getName().toLower()  +" action=history id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('History')}\"><span class=\"fa fa-book\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=history id=$" + this->lcFirst(this->model.getName())+ "->getId" + this->model.getName()+"()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('History')}\"><span class=\"fa fa-book\"></span></a>")
                                 .append("\n");
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
     //<a href="{url module=core controller=user action=update idUser=$user->getIdUser()}" class="btn btn-default" data-toggle="tooltip" title="{$i18n->translate('History')}"><span class="fa fa-book"></span></a>
                     }
 
@@ -153,12 +166,13 @@ QString ZfView::generateIndex()
     index.append("</fieldset>\n");
 
     return index;
+
 }
 
 
 QString ZfView::generateForm()
 {
-
+    QRegExp exp("([A-Z])");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
@@ -175,7 +189,7 @@ QString ZfView::generateForm()
 
     index.append("<fieldset>\n");
     index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")}</legend>\n");
-    index.append("\t<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->model.getName().toLower() + "/save\">\n");
+    index.append("\t<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/save\">\n");
     index.append("\t\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
     foreach (column, this->columns) {
         if(column.getField() != primaryKey.getField())
@@ -184,21 +198,21 @@ QString ZfView::generateForm()
 
                 index.append("\t").append("\t");
                 index.append("<div class=\"form-group\">").append("\n");
-                index.append("\t\t\t").append("<label for=\"" + this->lcFirst(column.getField()) + "\" class=\"col-sm-2 control-label\">{$i18n->translate(\"" + this->ucfirst(column.getField()) + "\")}</label>").append("\n");
+                index.append("\t\t\t").append("<label for=\"" + this->lcFirst(this->ucfirst(column.getField())) + "\" class=\"col-sm-2 control-label\">{$i18n->translate(\"" + this->ucfirst(column.getField()) + "\")}</label>").append("\n");
                 index.append("\t\t\t").append("<div class=\"col-sm-10\">").append("\n");
 
                 if(column.isDate())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 else if (column.isNumber())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isFloat())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isTime())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isLongText())
-                    index.append("\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
+                    index.append("\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
                 else
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 index.append("\t\t\t").append("</div>").append("\n");
                 index.append("\t\t</div>").append("\n");
 
@@ -211,7 +225,7 @@ QString ZfView::generateForm()
 
     index.append("\t\t<div class=\"form-group\">").append("\n");
     index.append("\t\t\t<div class=\"col-sm-offset-2 col-sm-10\">").append("\n");
-    index.append("\t\t\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->model.getName().toLower() + " action=index}\" class=\"btn btn-default\">{$i18n->translate(\"Cancel\")}</a>").append("\n");
+    index.append("\t\t\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=index}\" class=\"btn btn-default\">{$i18n->translate(\"Cancel\")}</a>").append("\n");
     index.append("\t\t\t<button type=\"submit\" class=\"btn btn-primary\">{$i18n->translate(\"Save\")}</button>").append("\n");
     index.append("\t\t\t</div>").append("\n");
     index.append("\t\t</div>").append("\n");
@@ -226,6 +240,7 @@ QString ZfView::generateForm()
 
 QString ZfView::generateHistory()
 {
+    QRegExp exp("([A-Z])");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
@@ -266,7 +281,7 @@ QString ZfView::generateHistory()
     index.append("\t\t\t</tbody>").append("\n");
     index.append("\t\t</table>").append("\n");
     index.append("\t</div>").append("\n");
-    index.append("\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->model.getName().toLower() + " action=index}\" class=\"btn btn-default\">{$i18n->translate('Go Back')}</a>").append("\n");
+    index.append("\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=index}\" class=\"btn btn-default\">{$i18n->translate('Go Back')}</a>").append("\n");
     index.append("</fieldset>\n");
 
     return index;
@@ -283,14 +298,16 @@ GeCoBean ZfView::getByExntendName(QString extend)
 void ZfView::writeIndex( QString str)
 {
 //+ "/index.tpl"
-    QDir viewDirectory(str + "/" + this->model.getName().toLower());
+    QRegExp exp("([A-Z])");
+    QString viewFolder  = this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower();
+    QDir viewDirectory(str + "/" + viewFolder);
 
 
 
     if (!viewDirectory.exists())
         viewDirectory.mkdir(viewDirectory.path());
 
-    str.append("/").append(this->model.getName().toLower()).append("/").append("index.tpl");
+    str.append("/").append(viewFolder).append("/").append("index.tpl");
     QFile file(str);
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);
@@ -303,14 +320,17 @@ void ZfView::writeIndex( QString str)
 void ZfView::writeForm( QString str)
 {
 //+ "/index.tpl"
-    QDir viewDirectory(str + "/" + this->model.getName().toLower());
 
+    QRegExp exp("([A-Z])");
+    QString viewFolder  = this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower();
+
+    QDir viewDirectory(str + "/" + viewFolder);
 
 
     if (!viewDirectory.exists())
         viewDirectory.mkdir(viewDirectory.path());
 
-    str.append("/").append(this->model.getName().toLower()).append("/").append("form.tpl");
+    str.append("/").append(viewFolder).append("/").append("form.tpl");
     QFile file(str);
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);
@@ -323,14 +343,16 @@ void ZfView::writeForm( QString str)
 void ZfView::writeHistory( QString str)
 {
 //+ "/index.tpl"
-    QDir viewDirectory(str + "/" + this->model.getName().toLower());
+    QRegExp exp("([A-Z])");
+    QString viewFolder  = this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower();
+    QDir viewDirectory(str + "/" + viewFolder);
 
 
 
     if (!viewDirectory.exists())
         viewDirectory.mkdir(viewDirectory.path());
 
-    str.append("/").append(this->model.getName().toLower()).append("/").append("history.tpl");
+    str.append("/").append(viewFolder).append("/").append("history.tpl");
     QFile file(str);
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);

@@ -5,6 +5,36 @@ GeCo::GeCo()
 
 }
 
+QString GeCo::ucfirst(QString str)
+{
+    if (str.size() < 1) {
+        return "";
+    }
+
+    QStringList tokens = str.split("_");
+    QList<QString>::iterator tokItr = tokens.begin();
+
+    for (tokItr = tokens.begin(); tokItr != tokens.end(); ++tokItr) {
+        (*tokItr) = (*tokItr).at(0).toUpper() + (*tokItr).mid(1);
+    }
+    return tokens.join("");
+}
+
+QString GeCo::lcFirst(QString str)
+{
+    if (str.size() < 1) {
+        return "";
+    }
+
+    QStringList tokens = str.split("_");
+    QList<QString>::iterator tokItr = tokens.begin();
+
+    for (tokItr = tokens.begin(); tokItr != tokens.end(); ++tokItr) {
+        (*tokItr) = (*tokItr).at(0).toLower() + (*tokItr).mid(1);
+    }
+    return tokens.join("");
+}
+
 QString GeCo::camelCase(QString str) {
 
     QString prefix;
@@ -239,8 +269,12 @@ void GeCo::generateModel(GeCoBean model)
         collection->write(this->path + "/module/Application/src/Application/Model/Collection/" + model.getName() + "Collection.php");
 
     //Generate Catalog
+    this->settings->beginGroup("parameters");
+    QString prefixes = this->settings->value("prefixes").toString();
+
+    this->settings->endGroup();
     ZfCatalog *catalog = new ZfCatalog(model,this->beans);
-    catalog->generate();
+    catalog->generate(prefixes);
     if(!model.isDefaultModule())
         catalog->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Catalog/" + model.getName() + "Catalog.php");
     else
@@ -248,7 +282,7 @@ void GeCo::generateModel(GeCoBean model)
 
     //Generate Query
     ZfQuery *query = new ZfQuery(model,this->beans);
-    query->generate();
+    query->generate(prefixes);
     if(!model.isDefaultModule())
         query->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Query/" + model.getName() + "Query.php");
     else
@@ -259,6 +293,7 @@ void GeCo::generateModel(GeCoBean model)
 
 void GeCo::generateCRUD(GeCoBean model)
 {
+    QRegExp exp("([A-Z])");
     ZfCRUD *crud = new ZfCRUD(model, this->beans);
     crud->generate();
     if(!model.isDefaultModule())
@@ -266,9 +301,11 @@ void GeCo::generateCRUD(GeCoBean model)
     else
         crud->write(this->path + "/module/Application/src/Application/Controller/" + model.getName() + "Controller.php");
 
-    QDir viewDirectory(this->path + "/module/Application/view/" + model.getModule().toLower());
+    QString viewModulePath = this->lcFirst(this->ucfirst(model.getModule())).replace(exp, "-\\1").toLower();
+
+    QDir viewDirectory(this->path + "/module/Application/view/" + viewModulePath);
     if(!model.isDefaultModule())
-        viewDirectory.setPath(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+        viewDirectory.setPath(this->path + "/module/" + model.getModule() + "/view/" + viewModulePath);
 
 
     if (!viewDirectory.exists())
@@ -278,17 +315,17 @@ void GeCo::generateCRUD(GeCoBean model)
     ZfView *view = new ZfView(model, this->beans);
 //    view->generate();
     if(!model.isDefaultModule())
-        view->writeIndex(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+        view->writeIndex(this->path + "/module/" + model.getModule() + "/view/"  + viewModulePath);
     else
         view->writeIndex(this->path + "/module/Application/src/Application/view/application");
 
     if(!model.isDefaultModule())
-        view->writeForm(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+        view->writeForm(this->path + "/module/" + model.getModule() + "/view/" + viewModulePath);
     else
         view->writeForm(this->path + "/module/Application/src/Application/view/application");
 
     if(!model.isDefaultModule())
-        view->writeHistory(this->path + "/module/" + model.getModule() + "/view/" + model.getModule().toLower());
+        view->writeHistory(this->path + "/module/" + model.getModule() + "/view/" + viewModulePath);
     else
         view->writeHistory(this->path + "/module/Application/src/Application/view/application");
 
@@ -321,7 +358,7 @@ void GeCo::createStructure()
     QDir factory("Factory");
     QDir metadata("Metadata");
 
-
+QRegExp exp("([A-Z])");
     GeCoBean beanModel;
     foreach (beanModel, this->beans) {
         if(!beanModel.isDefaultModule())
@@ -342,8 +379,11 @@ void GeCo::createStructure()
             module.setPath(currentModule.path().append("/").append(view.path()));
 
             if (!module.exists())
-                module.mkdir(module.path());
-            module.setPath(currentModule.path().append("/").append(view.path()).append("/").append(beanModel.getModule().toLower()));
+                module.mkdir(module.path());//this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()
+
+            QString viewController = this->ucfirst(beanModel.getModule());
+            QString viewControllerSepared = this->lcFirst(viewController);
+            module.setPath(currentModule.path().append("/").append(view.path()).append("/").append(viewControllerSepared.replace(exp, "-\\1").toLower()));
             if (!module.exists())
                 module.mkdir(module.path());
 

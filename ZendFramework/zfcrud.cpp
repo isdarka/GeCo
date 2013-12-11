@@ -41,7 +41,7 @@ QString ZfCRUD::lcFirst(QString str)
 
 void ZfCRUD::generate()
 {
-
+    QRegExp exp("([A-Z])");
     GeCoBean extra;
     this->code.setClassName(this->model.getName() + "Controller");
     if(!this->model.getExtend().isEmpty())
@@ -78,16 +78,18 @@ void ZfCRUD::generate()
     methodIndex.setName("indexAction");
     methodIndex.setVisibility(Method::PUBLIC);
     methodIndex.isStatic(false);
+    methodIndex.addBody("$queryParams = $this->params()->fromQuery();");
     methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
     methodIndex.addBody("$total = $" + this->lcFirst(this->model.getName()) +"Query->count();");
     methodIndex.addBody("$page = $this->params()->fromRoute(\"page\", 1);");
-    methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage)->find();");
+    methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->filter($queryParams)->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage)->find();");
     methodIndex.addBody("");
     methodIndex.addBody("//Views");
     methodIndex.addBody("$this->view->" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"s;");
     methodIndex.addBody("$this->view->pages = ceil($total / $this->maxPerPage);");
     methodIndex.addBody("$this->view->currentPage = $page;");
     methodIndex.addBody("$this->view->total = $total;");
+    methodIndex.addBody("$this->view->queryParams = $queryParams;");
     methodIndex.addBody("return $this->view;");
     methodIndex.setDocblock(docblockIndex);
     this->code.addMethod(methodIndex);
@@ -104,7 +106,7 @@ void ZfCRUD::generate()
     methodCreate.addBody("$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
     methodCreate.addBody("");
     methodCreate.addBody("//Views");
-    methodCreate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/form.tpl\");");
+    methodCreate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
     methodCreate.addBody("return $this->view;");
     methodCreate.setDocblock(docblockCreate);
     this->code.addMethod(methodCreate);
@@ -135,7 +137,7 @@ void ZfCRUD::generate()
     methodUpdate.addBody("}");
 
     methodUpdate.addBody("//Views");
-    methodUpdate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->model.getName().toLower() +"/form.tpl\");");
+    methodUpdate.addBody("$this->view->setTemplate(\"" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
     methodUpdate.addBody("return $this->view;");
     methodUpdate.setDocblock(docblockUpdate);
     this->code.addMethod(methodUpdate);
@@ -177,7 +179,7 @@ void ZfCRUD::generate()
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
     methodSave.addBody("}");
 
-    methodSave.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->model.getName().toLower() +"','action' => 'index',));");
+    methodSave.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
     methodSave.addBody("return $this->view;");
     methodSave.setDocblock(docblockSave);
     this->code.addMethod(methodSave);
@@ -208,7 +210,7 @@ void ZfCRUD::generate()
         methodEnable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodEnable.addBody("}");
-        methodEnable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->model.getName().toLower() +"','action' => 'index',));");
+        methodEnable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
         methodEnable.addBody("return $this->view;");
         methodEnable.setDocblock(docblockEnable);
         this->code.addMethod(methodEnable);
@@ -236,7 +238,7 @@ void ZfCRUD::generate()
         methodDisable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodDisable.addBody("}");
-        methodDisable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->model.getName().toLower() +"','action' => 'index',));");
+        methodDisable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
         methodDisable.addBody("return $this->view;");
         methodDisable.setDocblock(docblockDisable);
         this->code.addMethod(methodDisable);
@@ -295,7 +297,7 @@ void ZfCRUD::generate()
         this->code.addUse("Core\\Query\\UserQuery");
         methodHistory.addBody("} catch (\\Exception $e) {");
         methodHistory.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->model.getName()) +"','action' => 'index',));");
+        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
         methodHistory.addBody("}");
         methodHistory.addBody("return $this->view;");
         methodHistory.setDocblock(History);
