@@ -203,7 +203,8 @@ void ZfCRUD::generate()
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
-        methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::ENABLE);");
+        if(this->model.getLog())
+            methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodEnable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been enabled.');");
         methodEnable.addBody("} catch (\\Exception $e) {");
@@ -231,7 +232,8 @@ void ZfCRUD::generate()
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
-        methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::DISABLE);");
+        if(this->model.getLog())
+            methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodDisable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been disabled.');");
         methodDisable.addBody("} catch (\\Exception $e) {");
