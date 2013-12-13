@@ -83,6 +83,7 @@ void ZfCRUD::generate()
     methodIndex.addBody("$total = $" + this->lcFirst(this->model.getName()) +"Query->count();");
     methodIndex.addBody("$page = $this->params()->fromRoute(\"page\", 1);");
     methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->filter($queryParams)->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage)->find();");
+    methodIndex.addBody("$this->setPaginator($total, $page, __METHOD__);");
     methodIndex.addBody("");
     methodIndex.addBody("//Views");
     methodIndex.addBody("$this->view->" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"s;");
@@ -274,6 +275,7 @@ void ZfCRUD::generate()
         methodHistory.isStatic(false);
         methodHistory.addBody("try {");
         methodHistory.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
+        methodHistory.addBody("\t$page = $this->params()->fromRoute(\"page\", 1);");
         methodHistory.addBody("\tif(!$id" + this->model.getName() +" )");
         methodHistory.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
 
@@ -283,12 +285,15 @@ void ZfCRUD::generate()
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");        
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdatper());");
+        methodHistory.addBody("\t$total = $" + this->lcFirst(this->model.getName()) +"LogQuery->count();");
 
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->whereAdd(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +", $" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) +"());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->addDescendingOrderBy(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +"_LOG );");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage);");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Logs = $" + this->lcFirst(this->model.getName()) +"LogQuery->find();");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->find();");
+        methodHistory.addBody("\t$this->setPaginator($total, $page, __METHOD__);");
 
         methodHistory.addBody("");
         methodHistory.addBody("\t //Views");
