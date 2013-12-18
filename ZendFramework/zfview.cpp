@@ -48,7 +48,7 @@ QString ZfView::generateIndex()
     allow = this->model.getModule().toLower().append("\\").append("controller").append("\\").append(this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()).append("::");
     index.append("<fieldset>\n");
     index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")} ").append("\n");
-    index.append("\t").append("\t").append("{if \"" + allow + "create\"|isAllowed}").append("\n");
+    index.append("\t").append("\t").append("{if '" + allow + "create'|isAllowed}").append("\n");
     index.append("\t\t\t<a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate(\"New " + this->model.getName() +"\")}</a>\n");
     index.append("\t").append("\t").append("{/if}").append("\n");
     index.append("\t</legend>").append("\n");
@@ -71,7 +71,12 @@ QString ZfView::generateIndex()
                     foreach (column, this->columns) {
                         if(column.isPkAutoIncrement())
                             primaryKey = column;
-                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th><input type=\"text\" class=\"form-control\" name=\"" + column.getField() + "\" placeholder=\"{$i18n->translate('" + column.getField().toUpper() + "')}\" value=\"{$queryParams['" + column.getField() + "']}\"></th>").append("\n");
+                        if(column.getField() == "status"){
+                            index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>").append("\n");
+                            index.append("\t").append("\t").append("\t").append("\t").append("\t\t").append("{html_options options=array(\"{$i18n->translate(\"Select a option\")}\") + $statuses name=\"status\" id=\"status\" class=\"form-control\" selected=\"{$queryParams['status']}\"}").append("\n");
+                            index.append("\t").append("\t").append("\t").append("\t").append("\t").append("</th>").append("\n");
+                        }else
+                            index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th><input type=\"text\" class=\"form-control\" name=\"" + column.getField() + "\" placeholder=\"{$i18n->translate('" + column.getField().toUpper() + "')}\" value=\"{$queryParams['" + column.getField() + "']}\"></th>").append("\n");
                     }
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-primary \">{$i18n->translate(\"Filter\")}</button></th>").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("</tr>").append("\n");
@@ -114,9 +119,9 @@ QString ZfView::generateIndex()
 
 
                     //{if "Core\Controller\Role::update"|isAllowed}
-                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if \"" + allow + "update\"|isAllowed}").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if '" + allow + "update'|isAllowed}").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                            .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=update id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
+                            .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=update id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
                             .append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
 //<a href="{url module=core controller=user action=update idUser=$user->getIdUser()}" class="btn btn-default" data-toggle="tooltip" title="{$i18n->translate('Edit')}"><span class="fa fa-pencil"></span></a>
@@ -126,17 +131,17 @@ QString ZfView::generateIndex()
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
                                 .append("{if $" + this->lcFirst(this->model.getName()) + "->isEnabled()}")
                                 .append("\n");
-                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if \"" + allow + "disable\"|isAllowed}").append("\n");
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if '" + allow + "disable'|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=disable id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Disable')}\"><span class=\"fa fa-times-circle-o\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +"' action=disable id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Disable')}\"><span class=\"fa fa-times-circle-o\"></span></a>")
                                 .append("\n");
                         index.append("\t").append("\t\t\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
                                 .append("{else if $" + this->lcFirst(this->model.getName()) + "->isDisabled()}")
                                 .append("\n");
-                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if \"" + allow + "enable\"|isAllowed}").append("\n");
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{if '" + allow + "enable'|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=enable id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Enable')}\"><span class=\"fa fa-check-circle-o\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +"' action=enable id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Enable')}\"><span class=\"fa fa-check-circle-o\"></span></a>")
                                 .append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t\t\t").append("{/if}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
@@ -146,9 +151,9 @@ QString ZfView::generateIndex()
 
                     if(this->model.getLog())
                     {
-                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if \"" + allow + "history\"|isAllowed}").append("\n");
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if '" + allow + "history'|isAllowed}").append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +" action=history id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('History')}\"><span class=\"fa fa-book\"></span></a>")
+                                .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()  +"' action=history id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('History')}\"><span class=\"fa fa-book\"></span></a>")
                                 .append("\n");
                         index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
     //<a href="{url module=core controller=user action=update idUser=$user->getIdUser()}" class="btn btn-default" data-toggle="tooltip" title="{$i18n->translate('History')}"><span class="fa fa-book"></span></a>
@@ -284,7 +289,7 @@ QString ZfView::generateHistory()
     index.append("\t\t\t</tbody>").append("\n");
     index.append("\t\t</table>").append("\n");
     index.append("\t</div>").append("\n");
-    index.append("\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=index}\" class=\"btn btn-default\">{$i18n->translate('Go Back')}</a>").append("\n");
+    index.append("\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=index}\" class=\"btn btn-default\">{$i18n->translate('Go Back')}</a>").append("\n");
     index.append("</fieldset>\n");
 
     return index;
