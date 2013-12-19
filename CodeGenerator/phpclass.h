@@ -33,7 +33,8 @@ private:
     QString namespaceString;
     QVector<Method> methods;
     QVector<Propertie> properties;
-    QVector<QString> uses;
+    //QVector<QString> uses;
+       QStringList uses;
     Docblock docblock;
 };
 

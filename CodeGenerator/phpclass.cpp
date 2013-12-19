@@ -75,6 +75,8 @@ QString PhpClass::generate()
     code.append("namespace " + this->namespaceString + ";");
     code.append("\n");
     code.append("\n");
+
+    this->uses.removeDuplicates();
     QString use;
     foreach (use, this->uses) {        
         code.append("use " + use + ";");
