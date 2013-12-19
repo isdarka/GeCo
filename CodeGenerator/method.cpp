@@ -15,13 +15,22 @@ void Method::setName(QString name)
 
 void Method::addParam(QString paramName)
 {
-    this->params.append(paramName);
+    QStringList param;
+    param.append(paramName);
+    this->params.append(param);
+//    this->params.append(paramName);
 }
 
 void Method::addParam(QString paramName, QString instance)
 {
-    this->paramsT.append(paramName);
-    this->types.append(instance);
+    QStringList param;
+    param.append(paramName);
+    param.append(instance);
+    this->params.append(param);
+
+
+//    this->paramsT.append(paramName);
+//    this->types.append(instance);
 }
 
 
@@ -38,7 +47,7 @@ void Method::setVisibility(QString type)
 QString Method::generate()
 {
     QString method = "";
-    QString param;
+    QStringList param;
 
     QString body;
     method.append("\t"  + this->docblock.getDocblock("\t"));
@@ -49,14 +58,25 @@ QString Method::generate()
         method.append(" function ");
         method.append(this->name);
         method.append("(");
-        foreach (param, this->params)
-            method.append("$" + param + ", ");
 
-        for(int i = 0; i<this->paramsT.count(); i++)
+        foreach (param, this->params)
         {
-            method.append(this->types.at(i) + " $" + this->paramsT.at(i) + ", ");
+            if(param.count() == 1)
+                method.append("$" + param.first() + ", ");
+            else{
+                method.append(param.last() + " $" + param.first() + ", ");
+            }
+
         }
-        if(this->paramsT.count() > 0 || this->params.count()  > 0)
+
+            //method.append("$" + param + ", ");
+
+//        for(int i = 0; i<this->paramsT.count(); i++)
+//        {
+//            method.append(this->types.at(i) + " $" + this->paramsT.at(i) + ", ");
+//        }
+        //if(this->paramsT.count() > 0 || this->params.count()  > 0)
+        if(this->params.count()  > 0)
             method = method.mid(0,(method.length() - 2));
         method.append(") \n");
         method.append("\t{");
@@ -68,7 +88,7 @@ QString Method::generate()
         method.append(" = array( \n\t");
 
         foreach (param, this->params)
-            method.append("\t" + param + ", \n\t");
+            method.append("\t" + param.first() + ", \n\t");
 
         method.append("\n\t);");
     }

@@ -321,9 +321,10 @@ void ZfCRUD::generate()
         methodLog.setVisibility(Method::PRIVATE);
         methodLog.isStatic(false);
 
+        methodLog.addParam("bean", "AbstractBean");
         methodLog.addParam("event");
         methodLog.addParam("note = \"\"");
-        methodLog.addParam("bean", "AbstractBean");
+
 
         methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog = new " + this->model.getName() +"LogCatalog($this->getAdatper());");
         methodLog.addBody("$date = new \\DateTime(\"now\");");

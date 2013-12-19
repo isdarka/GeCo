@@ -3,6 +3,7 @@
 #include <QString>
 #include <QStringList>
 #include <CodeGenerator/docblock.h>
+#include <QVector>
 class Method
 {
 public:
@@ -23,14 +24,15 @@ public:
     bool getIsFunction();
 private:
     QString name;
-    QStringList params;
+//    QStringList params;
 
-    QStringList paramsT;
-    QStringList types;
+//    QStringList paramsT;
+//    QStringList types;
 
     QStringList body;
     QString visibility;
     Docblock docblock;
+    QVector<QStringList> params;
     bool methodStatic = false;
     bool methodFunction = true;
 };
