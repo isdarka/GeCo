@@ -28,7 +28,11 @@ QVector<ColumnBean> TableCatalog::getColumnsByTable(QString tableName)
 
         bean.setField(query.value(0).toString());
         bean.setType(query.value(1).toString());
-        bean.setNull(query.value(2).toBool());
+        //qDebug() << query.value(0).toString() + " -- " + query.value(2).toString();
+        if(query.value(2).toString() == "YES")
+            bean.setNull(true);
+        else
+            bean.setNull(false);
         bean.setKey(query.value(3).toString());
         bean.setDefault(query.value(4).toString());
         bean.setExtra(query.value(5).toString());

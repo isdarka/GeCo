@@ -62,6 +62,8 @@ void ZfCRUD::generate()
     ColumnBean column;
     ColumnBean primaryKey;
 
+    QStringList foreingKeys;
+    foreingKeys.empty();
     bool hasStatus = false;
     foreach (column, this->columns) {
         if(column.getField() == "status")
@@ -69,8 +71,20 @@ void ZfCRUD::generate()
 
         if(column.isPkAutoIncrement())
             primaryKey = column;
-    }
 
+        if(column.isForeingKey())
+        {
+            QString entity = column.getField().mid(3, column.getField().size());
+            foreingKeys.append(this->ucfirst(entity));
+            //qDebug() << this->ucfirst(entity);
+           // foreingKeys.append(this->ucfirst(column.getField()));
+        }
+    }
+    foreingKeys.removeDuplicates();
+//    QString nameFo;
+//    foreach (nameFo, foreingKeys) {
+//        qDebug() <<  nameFo;
+//    }
 
     Method methodIndex;
     Docblock docblockIndex;
@@ -79,12 +93,22 @@ void ZfCRUD::generate()
     methodIndex.setVisibility(Method::PUBLIC);
     methodIndex.isStatic(false);
     methodIndex.addBody("$queryParams = $this->params()->fromQuery();");
-    methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+    methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
     methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"Query->filter($queryParams);");
     methodIndex.addBody("$total = $" + this->lcFirst(this->model.getName()) +"Query->count();");
     methodIndex.addBody("$page = $this->params()->fromRoute(\"page\", 1);");
     methodIndex.addBody("$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage)->find();");
     methodIndex.addBody("$this->setPaginator($total, $page, __METHOD__);");
+
+    QString relation;
+    GeCoBean relationBean;
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        this->code.addUse(relationBean.getModule() + "\\Query\\" + relationBean.getName() + "Query");
+        methodIndex.addBody("$" + this->lcFirst(relationBean.getName()) + "Query = new "+ relationBean.getName() + "Query($this->getAdapter());");
+        methodIndex.addBody("$" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Query->find();");
+    }
+
     methodIndex.addBody("");
     methodIndex.addBody("//Views");
     methodIndex.addBody("$this->view->" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"s;");
@@ -92,6 +116,14 @@ void ZfCRUD::generate()
     methodIndex.addBody("$this->view->currentPage = $page;");
     methodIndex.addBody("$this->view->total = $total;");
     methodIndex.addBody("$this->view->queryParams = $queryParams;");
+    if(!foreingKeys.isEmpty())
+        methodIndex.addBody("//Relations");
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        methodIndex.addBody("$this->view->" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Collection;");
+    }
+    if(!foreingKeys.isEmpty())
+        methodIndex.addBody("");
     if(hasStatus)
         methodIndex.addBody("$this->view->statuses = " + this->model.getName() + "::$statuses;");
     methodIndex.addBody("return $this->view;");
@@ -108,7 +140,25 @@ void ZfCRUD::generate()
     methodCreate.isStatic(false);
     methodCreate.addBody("$" + this->lcFirst(this->model.getName()) +" = new " + this->model.getName() +"();");
     methodCreate.addBody("$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
+
+
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        this->code.addUse(relationBean.getModule() + "\\Query\\" + relationBean.getName() + "Query");
+        methodCreate.addBody("$" + this->lcFirst(relationBean.getName()) + "Query = new "+ relationBean.getName() + "Query($this->getAdapter());");
+        methodCreate.addBody("$" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Query->find();");
+    }
+    if(!foreingKeys.isEmpty()){
     methodCreate.addBody("");
+    methodCreate.addBody("//Relations");
+    }
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        methodCreate.addBody("$this->view->" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Collection;");
+    }
+
+
+    methodCreate.addBody("");    
     methodCreate.addBody("//Views");
     methodCreate.addBody("$this->view->setTemplate(\"" + this->lcFirst(this->ucfirst(this->model.getModule())).replace(exp, "-\\1").toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/form.tpl\");");
     methodCreate.addBody("return $this->view;");
@@ -126,8 +176,25 @@ void ZfCRUD::generate()
     methodUpdate.addBody("\tif(!$id" + this->model.getName() +")");
     methodUpdate.addBody("\t\tthrow new \\Exception($this->i18n->translate('" + this->model.getName() +" not defined.'));");
     methodUpdate.addBody("");
-    methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+    methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
     methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+
+
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        this->code.addUse(relationBean.getModule() + "\\Query\\" + relationBean.getName() + "Query");
+        methodUpdate.addBody("\t$" + this->lcFirst(relationBean.getName()) + "Query = new "+ relationBean.getName() + "Query($this->getAdapter());");
+        methodUpdate.addBody("\t$" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Query->find();");
+    }
+    if(!foreingKeys.isEmpty()){
+        methodUpdate.addBody("");
+        methodUpdate.addBody("\t//Relations");
+    }
+    foreach (relation, foreingKeys) {
+        relationBean = this->getByExntendName(relation);
+        methodUpdate.addBody("\t$this->view->" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Collection;");
+    }
+
     methodUpdate.addBody("");
     methodUpdate.addBody("\t//Views");
     methodUpdate.addBody("\t$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
@@ -157,7 +224,7 @@ void ZfCRUD::generate()
     methodSave.addBody("$id" + this->model.getName() +" = $this->params()->fromPost(\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\", 0);");
     methodSave.addBody("if($id" + this->model.getName() +")");
     methodSave.addBody("{");
-    methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+    methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
     methodSave.addBody("}else{");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +" = new " + this->model.getName() +"();");
@@ -167,7 +234,7 @@ void ZfCRUD::generate()
 
     methodSave.addBody("}");
     methodSave.addBody("");
-    methodSave.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdatper());");
+    methodSave.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdapter());");
     methodSave.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
 
     methodSave.addBody("try {");
@@ -197,13 +264,13 @@ void ZfCRUD::generate()
         methodEnable.setName("enableAction");
         methodEnable.setVisibility(Method::PUBLIC);
         methodEnable.isStatic(false);
-        methodEnable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdatper());");
+        methodEnable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdapter());");
         methodEnable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
         methodEnable.addBody("try {");
         methodEnable.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodEnable.addBody("\tif(!$id" + this->model.getName() +")");
         methodEnable.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
-        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
@@ -226,13 +293,13 @@ void ZfCRUD::generate()
         methodDisable.setName("disableAction");
         methodDisable.setVisibility(Method::PUBLIC);
         methodDisable.isStatic(false);
-        methodDisable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdatper());");
+        methodDisable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdapter());");
         methodDisable.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
         methodDisable.addBody("try {");
         methodDisable.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodDisable.addBody("\tif(!$id" + this->model.getName() +")");
         methodDisable.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
-        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
@@ -282,19 +349,19 @@ void ZfCRUD::generate()
         methodHistory.addBody("\tif(!$id" + this->model.getName() +" )");
         methodHistory.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
 
-        methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdatper());");
+        methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdapter());");
         methodHistory.addBody("\t$users = $userQuery->find();");
 
-        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");        
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
-        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdatper());");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdapter());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->whereAdd(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +", $" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) +"());");
         methodHistory.addBody("\t$total = $" + this->lcFirst(this->model.getName()) +"LogQuery->count();");
 
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->addDescendingOrderBy(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +"_LOG );");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->limit($this->maxPerPage)->offset(($page -1) * $this->maxPerPage);");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Logs = $" + this->lcFirst(this->model.getName()) +"LogQuery->find();");
-        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdatper());");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"s = $" + this->lcFirst(this->model.getName()) +"Query->find();");
         methodHistory.addBody("\t$this->setPaginator($total, $page, __METHOD__);");
 
@@ -326,7 +393,7 @@ void ZfCRUD::generate()
         methodLog.addParam("note = \"\"");
 
 
-        methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog = new " + this->model.getName() +"LogCatalog($this->getAdatper());");
+        methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"LogCatalog = new " + this->model.getName() +"LogCatalog($this->getAdapter());");
         methodLog.addBody("$date = new \\DateTime(\"now\");");
         methodLog.addBody("$" + this->lcFirst(this->model.getName()) +"Log = " + this->model.getName() +"LogFactory::createFromArray(array(");
         methodLog.addBody("\t" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() + " => $bean->get" + this->ucfirst(primaryKey.getField()) + "(),");

@@ -86,14 +86,37 @@ void ZfFactory::generate()
     if(!this->model.getExtend().isEmpty())
         methodPopulate.addBody("parent::populate($" + this->lcFirst(this->model.getName()) +", $fields);");
     methodPopulate.addBody("if(!($" + this->lcFirst(this->model.getName()) +" instanceof " + this->model.getName() +"))");
-    methodPopulate.addBody("\tthrow new ActionException('$" + this->lcFirst(this->model.getName()) +" must be instance of " + this->model.getName() +"');");
+    methodPopulate.addBody("\tthrow new " + this->model.getName() +"Exception('$" + this->lcFirst(this->model.getName()) +" must be instance of " + this->model.getName() +"');");
+    this->code.addUse(this->model.getModule() +"\\Model\\Exception\\" + this->model.getName() +"Exception");
     methodPopulate.addBody("");
+
+    methodPopulate.addBody("if($fields instanceof \\stdClass)");
+    methodPopulate.addBody("{");
+    methodPopulate.addBody("\t$factory = self::getInstance();");
+    methodPopulate.addBody("\t$stdClass = clone $fields;");
+    methodPopulate.addBody("\t$fields = array();");
+    methodPopulate.addBody("\tforeach ($stdClass as $key => $value)");
+    methodPopulate.addBody("\t\t$fields[$factory->getUnderscore($key)] = $value;");
+    methodPopulate.addBody("}");
+    methodPopulate.addBody("");
+
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;
     foreach (column, this->columns) {
-        methodPopulate.addBody("if(isset($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"])){");
+        QString condition = "if(isset($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"])";
+        if(column.getNull())
+            condition.append(" && !empty($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"])");
+        condition.append("){");
+        methodPopulate.addBody(condition);
             methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"]);");
+//        if(column.getNull())
+//        {
+//            this->code.addUse("Zend\\Db\\Sql\\Expression");
+//            methodPopulate.addBody("}else{");
+//            methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"(new Expression('NULL'));");
+
+//        }
         methodPopulate.addBody("}");
         methodPopulate.addBody("");
     }

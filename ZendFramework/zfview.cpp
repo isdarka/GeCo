@@ -47,9 +47,9 @@ QString ZfView::generateIndex()
     QString allow ;
     allow = this->model.getModule().toLower().append("\\").append("controller").append("\\").append(this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower()).append("::");
     index.append("<fieldset>\n");
-    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")} ").append("\n");
+    index.append("\t<legend>{$i18n->translate('").append(this->model.getName()).append("')} ").append("\n");
     index.append("\t").append("\t").append("{if '" + allow + "create'|isAllowed}").append("\n");
-    index.append("\t\t\t<a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate(\"New " + this->model.getName() +"\")}</a>\n");
+    index.append("\t\t\t<a href=\"{$baseUrl}/" + this->model.getModule().toLower() +"/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/create\" class=\"btn btn-success pull-right\">{$i18n->translate('New " + this->model.getName() +"')}</a>\n");
     index.append("\t").append("\t").append("{/if}").append("\n");
     index.append("\t</legend>").append("\n");
         index.append("\t<div class=\"table-responsive\">\n");
@@ -73,12 +73,12 @@ QString ZfView::generateIndex()
                             primaryKey = column;
                         if(column.getField() == "status"){
                             index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>").append("\n");
-                            index.append("\t").append("\t").append("\t").append("\t").append("\t\t").append("{html_options options=array(\"{$i18n->translate(\"Select a option\")}\") + $statuses name=\"status\" id=\"status\" class=\"form-control\" selected=\"{$queryParams['status']}\"}").append("\n");
+                            index.append("\t").append("\t").append("\t").append("\t").append("\t\t").append("{html_options options=array(\"{$i18n->translate('Select a option')}\") + $statuses name=\"status\" id=\"status\" class=\"form-control\" selected=\"{$queryParams['status']}\"}").append("\n");
                             index.append("\t").append("\t").append("\t").append("\t").append("\t").append("</th>").append("\n");
                         }else
                             index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th><input type=\"text\" class=\"form-control\" name=\"" + column.getField() + "\" placeholder=\"{$i18n->translate('" + column.getField().toUpper() + "')}\" value=\"{$queryParams['" + column.getField() + "']}\"></th>").append("\n");
                     }
-                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-primary \">{$i18n->translate(\"Filter\")}</button></th>").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th class=\"col-xs-2\"><button type=\"submit\" class=\"form-control btn btn-primary \">{$i18n->translate('Filter')}</button></th>").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("</tr>").append("\n");
 
                 //END FILTER
@@ -92,13 +92,13 @@ QString ZfView::generateIndex()
                         if(column.getField() == "status")
                             hasStatus = true;
 
-                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>{$i18n->translate(\"").append(this->ucfirst(column.getField())).append("\")}</th>").append("\n");
+                        index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>{$i18n->translate('").append(this->ucfirst(column.getField())).append("')}</th>").append("\n");
 
 
 
 
                     }
-                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>{$i18n->translate(\"Actions\")}</th>").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("\t").append("<th>{$i18n->translate('Actions')}</th>").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("</tr>").append("\n");
                 index.append("\t").append("\t").append("\t").append("</thead>").append("\n");
 
@@ -195,35 +195,98 @@ QString ZfView::generateForm()
 
     QString index;
 
-    index.append("<fieldset>\n");
-    index.append("\t<legend>{$i18n->translate(\"").append(this->model.getName()).append("\")}</legend>\n");
-    index.append("\t<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/save\">\n");
-    index.append("\t\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
+
+    //EXTEND
+    GeCoBean extra;
+
+    if(!this->model.getExtend().isEmpty())
+        extra = this->getByExntendName(this->model.getExtend());
+
+
+//    foreach (relation, foreingKeys) {
+//        relationBean = this->getByExntendName(relation);
+//        this->code.addUse(relationBean.getModule() + "\\Query\\" + relationBean.getName() + "Query");
+//        methodUpdate.addBody("\t$" + this->lcFirst(relationBean.getName()) + "Query = new "+ relationBean.getName() + "Query();");
+//        methodUpdate.addBody("\t$" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Query->find();");
+//    }
+//    if(!foreingKeys.isEmpty()){
+//        methodUpdate.addBody("");
+//        methodUpdate.addBody("\t//Relations");
+//    }
+//    foreach (relation, foreingKeys) {
+//        relationBean = this->getByExntendName(relation);
+//        methodUpdate.addBody("\t$this->view->" + this->lcFirst(relationBean.getName()) + "Collection = $"+ this->lcFirst(relationBean.getName()) + "Collection;");
+//    }
+
+
+    index.append("<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/save\">\n");
+    index.append("\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
+    index.append("\t<div class=\"row\">\n");
+    index.append("\t\t<div class=\"col-xs-6\">\n");
+    index.append("\t\t\t<fieldset>\n");
+    index.append("\t\t\t\t<legend>{$i18n->translate('").append(this->model.getName()).append("')}</legend>\n");
+
+
+//    if(!this->model.getExtend().isEmpty()){
+//        this->columns = t.getColumnsByTable(extra.getTable());
+//        foreach (column, this->columns) {
+//            if(column.getField() != "status" && !column.isPkAutoIncrement())
+//            {
+//                index.append("\t").append("\t\t\t");
+//                index.append("<div class=\"form-group\">").append("\n");
+//                index.append("\t\t\t\t\t").append("<label for=\"" + this->lcFirst(this->ucfirst(column.getField())) + "\" class=\"col-sm-2 control-label\">{$i18n->translate('" + this->ucfirst(column.getField()) + ")}</label>").append("\n");
+//                index.append("\t\t\t\t\t").append("<div class=\"col-sm-10\">").append("\n");
+
+//                if(column.isDate())
+//                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+//                else if (column.isNumber())
+//                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+//                else if (column.isFloat())
+//                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+//                else if (column.isTime())
+//                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+//                else if (column.isLongText())
+//                    index.append("\t\t\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
+//                else
+//                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+//                index.append("\t\t\t\t\t").append("</div>").append("\n");
+//                index.append("\t\t\t\t</div>").append("\n");
+//            }
+//        }
+//    }
+
     foreach (column, this->columns) {
         if(column.getField() != primaryKey.getField())
         {
-            if(column.getField() != "status"){
+            if(column.getField() != "status" && column.getField().toUpper() != "ID_" + extra.getName().toUpper()){
 
-                index.append("\t").append("\t");
+                index.append("\t").append("\t\t\t");
                 index.append("<div class=\"form-group\">").append("\n");
-                index.append("\t\t\t").append("<label for=\"" + this->lcFirst(this->ucfirst(column.getField())) + "\" class=\"col-sm-2 control-label\">{$i18n->translate(\"" + this->ucfirst(column.getField()) + "\")}</label>").append("\n");
-                index.append("\t\t\t").append("<div class=\"col-sm-10\">").append("\n");
+                index.append("\t\t\t\t\t").append("<label for=\"" + this->lcFirst(this->ucfirst(column.getField())) + "\" class=\"col-sm-4 control-label\">{$i18n->translate('" + this->ucfirst(column.getField()) + "')}</label>").append("\n");
+                index.append("\t\t\t\t\t").append("<div class=\"col-sm-8\">").append("\n");
 
-                if(column.isDate())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                if(column.isForeingKey())
+                {
+                    QString entity = column.getField().mid(3, column.getField().size());
+                    entity =this->lcFirst(this->ucfirst(entity));
+                    index.append("\t\t\t\t\t\t").append("{html_options options=array(\"{$i18n->translate('Select a option')}\") + $" + entity + "Collection->toCombo() name=\"" + column.getField() + "\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" class=\"form-control\" selected=$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}").append("\n");
+
+//{html_options options=array("{$i18n->translate("Select a option")}") + $phoneTypes name="phoneType" id="phoneType" class="form-control"}
+                }
+                else if(column.isDate())
+                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required datepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 else if (column.isNumber())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required int \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isFloat())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required float\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isTime())
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
+                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isLongText())
-                    index.append("\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
+                    index.append("\t\t\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
                 else
-                    index.append("\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
-                index.append("\t\t\t").append("</div>").append("\n");
-                index.append("\t\t</div>").append("\n");
-
+                    index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
+                index.append("\t\t\t\t\t").append("</div>").append("\n");
+                index.append("\t\t\t\t</div>").append("\n");
 
 
             }
@@ -231,16 +294,20 @@ QString ZfView::generateForm()
         }
     }
 
-    index.append("\t\t<div class=\"form-group\">").append("\n");
-    index.append("\t\t\t<div class=\"col-sm-offset-2 col-sm-10\">").append("\n");
-    index.append("\t\t\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller=" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +" action=index}\" class=\"btn btn-default\">{$i18n->translate(\"Cancel\")}</a>").append("\n");
-    index.append("\t\t\t<button type=\"submit\" class=\"btn btn-primary\">{$i18n->translate(\"Save\")}</button>").append("\n");
-    index.append("\t\t\t</div>").append("\n");
+
+    index.append("\t\t\t</fieldset>\n");
+
+    index.append("\t\t</div>\n");
+    index.append("\t</div>\n");
+
+
+    index.append("\t<div class=\"form-group\">").append("\n");
+    index.append("\t\t<div class=\"col-sm-offset-2 col-sm-10\">").append("\n");
+    index.append("\t\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=index}\" class=\"btn btn-default\">{$i18n->translate('Cancel')}</a>").append("\n");
+    index.append("\t\t<button type=\"submit\" class=\"btn btn-primary\">{$i18n->translate('Save')}</button>").append("\n");
     index.append("\t\t</div>").append("\n");
-
-
-    index.append("\t</form>\n");
-    index.append("</fieldset>\n");
+    index.append("\t</div>").append("\n");
+    index.append("</form>\n");
 
     return index;
 }
@@ -264,15 +331,15 @@ QString ZfView::generateHistory()
     QString index;
 
     index.append("<fieldset>\n");
-    index.append("\t<legend>{$i18n->translate(\"History\")}</legend>\n");
+    index.append("\t<legend>{$i18n->translate('History')}</legend>\n");
     index.append("\t<div class=\"table-responsive\">\n");
     index.append("\t\t<table class=\"table table-bordered table-condensed table-hover\">").append("\n");
     index.append("\t\t\t<thead>").append("\n");
     index.append("\t\t\t\t<tr class=\"well\">").append("\n");
-    index.append("\t\t\t\t\t<th>{$i18n->translate(\"Username\")}</th>").append("\n");
-    index.append("\t\t\t\t\t<th>{$i18n->translate(\"Event\")}</th>").append("\n");
-    index.append("\t\t\t\t\t<th>{$i18n->translate(\"Date\")}</th>").append("\n");
-    index.append("\t\t\t\t\t<th>{$i18n->translate(\"Note\")}</th>").append("\n");
+    index.append("\t\t\t\t\t<th>{$i18n->translate('Username')}</th>").append("\n");
+    index.append("\t\t\t\t\t<th>{$i18n->translate('Event')}</th>").append("\n");
+    index.append("\t\t\t\t\t<th>{$i18n->translate('Date')}</th>").append("\n");
+    index.append("\t\t\t\t\t<th>{$i18n->translate('Note')}</th>").append("\n");
     index.append("\t\t\t\t</tr>").append("\n");
     index.append("\t\t\t</thead>").append("\n");
     index.append("\t\t\t<tbody>").append("\n");

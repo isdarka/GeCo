@@ -26,6 +26,7 @@ public:
     void addUse(QString use);
     void setNamespace(QString namespaceString);
     QString getNamespace();
+    void addMethodsDocblock(QString method);
 private:
     QString className;
     QString extends;
@@ -36,6 +37,7 @@ private:
     //QVector<QString> uses;
        QStringList uses;
     Docblock docblock;
+    QStringList methodsDocblock;
 };
 
 #endif // PHPCLASS_H

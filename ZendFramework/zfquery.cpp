@@ -120,6 +120,17 @@ void ZfQuery::generate(QString prefixString)
     docblock.addTag("created", QDateTime::currentDateTime().toString());
     docblock.addTag("version", "1.0");
 
+    QString methodDocblock;
+    methodDocblock = "\\" + this->model.getModule() + "\\Model\\Collection\\" + this->model.getName() + "Collection find()";
+    this->code.addMethodsDocblock(methodDocblock);
+    methodDocblock = "\\" + this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + " findByPK() findByPK($primaryKey)";
+    this->code.addMethodsDocblock(methodDocblock);
+    methodDocblock = "\\" + this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + " findByPKOrThrow() findByPKOrThrow($primaryKey, $exception)";
+    this->code.addMethodsDocblock(methodDocblock);
+    methodDocblock = "\\" + this->model.getModule() + "\\Model\\Bean\\" + this->model.getName() + " findOne()";
+    this->code.addMethodsDocblock(methodDocblock);
+
+
     this->code.setDocblock(docblock);
 
     this->code.setNamespace(this->model.getModule() + "\\Query");

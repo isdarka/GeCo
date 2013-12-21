@@ -65,7 +65,8 @@ void ZfCatalog::generate(QString prefixString)
         this->code.addUse("Model\\Catalog\\AbstractCatalog");
     }
 
-
+    TableCatalog t;
+    this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean primaryKey;
     ColumnBean column;
     foreach (column, this->columns) {
@@ -140,6 +141,30 @@ void ZfCatalog::generate(QString prefixString)
         methodUpdate.addBody("}");
         methodUpdate.setDocblock(docblockUpdate);
         this->code.addMethod(methodUpdate);
+
+
+        Method methodDelete;
+        Docblock docblockDelete;
+        docblockDelete.setShortDescription("Delete " + this->model.getName() + "");
+        methodDelete.setName("delete");
+        methodDelete.addParam("bean", "AbstractBean");
+        methodDelete.setVisibility(Method::PUBLIC);
+        methodDelete.isStatic(false);
+        methodDelete.addBody("try {");
+        if(!this->model.getExtend().isEmpty())
+            methodDelete.addBody("\tparent::delete($bean);");
+        methodDelete.addBody("\t$this->delete = $this->sql->delete($this->getMetadata()->getTableName());");
+        methodDelete.addBody("\t$where = new Where();");
+        methodDelete.addBody("\t$where->equalTo(self::getMetadata()->getPrimaryKey(), $bean->get" + this->ucfirst(primaryKey.getField())+"());");
+        methodDelete.addBody("\t$this->delete->where($where);");
+        methodDelete.addBody("\t$this->execute($this->delete);");
+        methodDelete.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
+        methodDelete.addBody("\tthrow $e;");
+        methodDelete.addBody("} catch (" + this->model.getName() + "Exception $e) {");
+        methodDelete.addBody("\tthrow $e;");
+        methodDelete.addBody("}");
+        methodDelete.setDocblock(docblockDelete);
+        this->code.addMethod(methodDelete);
     }
 
 QRegExp exp("([A-Z])");
@@ -242,7 +267,7 @@ QRegExp exp("([A-Z])");
             unlinkAll.setName("unlinkAll"+ this->ucfirst(relation));
             unlinkAll.setVisibility(Method::PUBLIC);
 
-                unlinkAll.addParam(this->lcFirst(this->ucfirst(fieldRelation)));
+                unlinkAll.addParam("id" + this->model.getName());
 
 
             unlinkAll.isStatic(false);
@@ -251,7 +276,7 @@ QRegExp exp("([A-Z])");
             unlinkAll.addBody("\t$where = new Where();");
 
 
-                unlinkAll.addBody("\t$where->equalTo('" + fieldRelation + "', $" + this->lcFirst(this->ucfirst(fieldRelation)) + ");");
+                unlinkAll.addBody("\t$where->equalTo('" + primaryKey.getField() + "', $id" + this->model.getName() + ");");
 
 
             unlinkAll.addBody("\t$this->delete->where($where);");

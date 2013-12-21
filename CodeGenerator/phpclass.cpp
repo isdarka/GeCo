@@ -83,6 +83,21 @@ QString PhpClass::generate()
         code.append("\n");
     }
     code.append("\n");
+
+    if(!this->methodsDocblock.empty())
+    {
+        code.append("\n");
+        code.append("/**").append("\n");
+        code.append(" * ").append(this->getNamespace()).append("\\").append(this->getClassName()).append("\n");
+        QString methodDocblock;
+        this->methodsDocblock.removeDuplicates();
+        foreach (methodDocblock, this->methodsDocblock) {
+            code.append(" * @method ").append(methodDocblock).append("\n");
+        }
+        code.append(" * ").append("\n");
+        code.append(" */").append("\n");
+
+    }
     code.append("class ");
     code.append(this->getClassName());
     if(this->isExtends())
@@ -142,4 +157,9 @@ void PhpClass::setNamespace(QString namespaceString)
 QString PhpClass::getNamespace()
 {
     return this->namespaceString;
+}
+
+void PhpClass::addMethodsDocblock(QString method)
+{
+    this->methodsDocblock.append(method);
 }
