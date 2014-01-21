@@ -62,3 +62,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \
     prefixes.ui
+
+RESOURCES += \
+    resources.qrc

@@ -64,7 +64,7 @@ void ZfMetadata::generate()
     docblockToUpdateArray.setShortDescription("toUpdateArray");
     methodToUpdateArray.setName("toUpdateArray");
     methodToUpdateArray.setVisibility(Method::PUBLIC);
-    methodToUpdateArray.isStatic(false);
+    methodToUpdateArray.isStatic(true);
     methodToUpdateArray.addParam("bean", "AbstractBean");
     methodToUpdateArray.addBody("return $bean->toArrayFor(");
     methodToUpdateArray.addBody("\tarray(");
@@ -86,7 +86,7 @@ void ZfMetadata::generate()
     docblockToCreateArray.setShortDescription("toCreateArray");
     methodToCreateArray.setName("toCreateArray");
     methodToCreateArray.setVisibility(Method::PUBLIC);
-    methodToCreateArray.isStatic(false);
+    methodToCreateArray.isStatic(true);
     methodToCreateArray.addParam("bean", "AbstractBean");
     methodToCreateArray.addBody("return $bean->toArrayFor(");
     methodToCreateArray.addBody("\tarray(");
@@ -104,7 +104,7 @@ void ZfMetadata::generate()
     docblockGetFields.setShortDescription("Get fields");
     methodGetFields.setName("getFields");
     methodGetFields.setVisibility(Method::PUBLIC);
-    methodGetFields.isStatic(false);
+    methodGetFields.isStatic(true);
 
     methodGetFields.addBody("return array(");
     foreach (column, this->columns) {
@@ -120,7 +120,7 @@ void ZfMetadata::generate()
     docblockEntityName.addTag("return", "string");
     methodEntityName.setName("getEntityName");
     methodEntityName.setVisibility(Method::PUBLIC);
-    methodEntityName.isStatic(false);
+    methodEntityName.isStatic(true);
     methodEntityName.addBody("return \"" + this->model.getName() +"\";");
     methodEntityName.setDocblock(docblockEntityName);
     this->code.addMethod(methodEntityName);
@@ -132,7 +132,7 @@ void ZfMetadata::generate()
     docblockTableName.addTag("return", "string");
     methodTableName.setName("getTableName");
     methodTableName.setVisibility(Method::PUBLIC);
-    methodTableName.isStatic(false);
+    methodTableName.isStatic(true);
     methodTableName.addBody("return \"" + this->model.getTable() +"\";");
     methodTableName.setDocblock(docblockTableName);
     this->code.addMethod(methodTableName);
@@ -144,7 +144,7 @@ void ZfMetadata::generate()
     docblockPrimaryKey.addTag("return", "string");
     methodPrimaryKey.setName("getPrimaryKey");
     methodPrimaryKey.setVisibility(Method::PUBLIC);
-    methodPrimaryKey.isStatic(false);
+    methodPrimaryKey.isStatic(true);
     methodPrimaryKey.addBody("return \"" + primaryKey.getField() +"\";");
     methodPrimaryKey.setDocblock(docblockPrimaryKey);
     this->code.addMethod(methodPrimaryKey);
@@ -157,7 +157,7 @@ void ZfMetadata::generate()
     docblockGetFactory.addTag("return", this->model.getName() + "Factory");
     methodGetFactory.setName("getFactory");
     methodGetFactory.setVisibility(Method::PUBLIC);
-    methodGetFactory.isStatic(false);
+    methodGetFactory.isStatic(true);
     methodGetFactory.addBody("static $factory = null;");
     methodGetFactory.addBody("if( null == $factory ){");
     methodGetFactory.addBody("\t$factory = new " + this->model.getName() +"Factory();");
@@ -172,7 +172,7 @@ void ZfMetadata::generate()
     docblockNewCollection.addTag("return", this->model.getName() + "Collection");
     methodNewCollection.setName("newCollection");
     methodNewCollection.setVisibility(Method::PUBLIC);
-    methodNewCollection.isStatic(false);
+    methodNewCollection.isStatic(true);
     methodNewCollection.addBody("return new " + this->model.getName() +"Collection();");
     methodNewCollection.setDocblock(docblockNewCollection);
     this->code.addMethod(methodNewCollection);
@@ -184,7 +184,7 @@ void ZfMetadata::generate()
     docblockNewBean.addTag("return", this->model.getName() + "");
     methodNewBean.setName("newBean");
     methodNewBean.setVisibility(Method::PUBLIC);
-    methodNewBean.isStatic(false);
+    methodNewBean.isStatic(true);
     methodNewBean.addBody("return new " + this->model.getName() +"();");
     methodNewBean.setDocblock(docblockNewBean);
     this->code.addMethod(methodNewBean);

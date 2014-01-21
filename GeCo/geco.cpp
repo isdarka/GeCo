@@ -278,7 +278,7 @@ void GeCo::generateModel(GeCoBean model)
     if(!model.isDefaultModule())
         catalog->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Model/Catalog/" + model.getName() + "Catalog.php");
     else
-        catalog->write(this->path + "/module/Application/src/Application/Model/Collection/" + model.getName() + "Catalog.php");
+        catalog->write(this->path + "/module/Application/src/Application/Model/Catalog/" + model.getName() + "Catalog.php");
 
     //Generate Query
     ZfQuery *query = new ZfQuery(model,this->beans);

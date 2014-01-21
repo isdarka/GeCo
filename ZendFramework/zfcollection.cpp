@@ -76,7 +76,7 @@ void ZfCollection::generate()
             method.setName("get" + this->ucfirst(column.getField()).replace("Id", "") + "Ids");
             method.setVisibility(Method::PUBLIC);
             method.addBody("return $this->map(function(" + this->model.getName() + " $" + this->lcFirst(this->model.getName()) + "){");
-            method.addBody("\treturn array($" + this->lcFirst(this->model.getName()) + "->get" + this->ucfirst(column.getField()) + "() => $action->get" + this->ucfirst(column.getField()) + "());");
+            method.addBody("\treturn array($" + this->lcFirst(this->model.getName()) + "->get" + this->ucfirst(column.getField()) + "() => $" + this->lcFirst(this->model.getName()) + "->get" + this->ucfirst(column.getField()) + "());");
             method.addBody("});");
             method.setDocblock(docblock);
             this->code.addMethod(method);

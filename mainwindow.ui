@@ -13,7 +13,34 @@
   <property name="windowTitle">
    <string>GeCo</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/Logo</normaloff>:/images/Logo</iconset>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>64</width>
+    <height>64</height>
+   </size>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>40</y>
+      <width>181</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="resources.qrc">:/images/Logo</pixmap>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -113,6 +140,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
