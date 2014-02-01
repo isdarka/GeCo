@@ -100,6 +100,8 @@ void ZfCatalog::generate(QString prefixString)
         methodCreate.addBody("\t$this->insert = $this->sql->insert(self::getMetadata()->getTableName());");
         methodCreate.addBody("\t$data = self::getMetadata()->toCreateArray($bean);");
         methodCreate.addBody("\t$data = array_filter($data, array($this, 'isNotNull'));");
+        methodCreate.addBody("\t$data = array_map(array($this, 'filterTags'), $data);");
+
         methodCreate.addBody("\t$this->insert->values($data);");
         methodCreate.addBody("\t$this->execute($this->insert);");
         methodCreate.addBody("\t$this->getMetadata()->getFactory()->populate($bean, array(");
@@ -127,6 +129,7 @@ void ZfCatalog::generate(QString prefixString)
         methodUpdate.addBody("\t$this->update = $this->sql->update(self::getMetadata()->getTableName());");
         methodUpdate.addBody("\t$data = self::getMetadata()->toUpdateArray($bean);");
         methodUpdate.addBody("\t$data = array_filter($data, array($this, 'isNotNull'));");
+        methodUpdate.addBody("\t$data = array_map(array($this, 'filterTags'), $data);");
         methodUpdate.addBody("\t$this->update->set($data);");
         methodUpdate.addBody("\t$where = new Where();");
         methodUpdate.addBody("\t$where->equalTo(self::getMetadata()->getPrimaryKey(), $bean->get" + this->ucfirst(primaryKey.getField())+"());");
