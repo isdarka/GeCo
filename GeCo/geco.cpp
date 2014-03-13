@@ -85,52 +85,50 @@ QDomDocument GeCo::getDefault()
 
     QString tablename;
     while(query.next()) {
-
-        QDomElement schema = document.createElement("schema");
-
-        root.appendChild(schema);
         tablename = query.value(0).toString();
 
-        QDomElement name = document.createElement("name");
+        if(tablename.mid(0,1) != "_")
+        {
+            QDomElement schema = document.createElement("schema");
+            root.appendChild(schema);
+            QDomElement name = document.createElement("name");
+                name.setAttribute("value", this->camelCase(query.value(0).toString()));
 
-            name.setAttribute("value", this->camelCase(query.value(0).toString()));
+            schema.appendChild(name);
+            QDomElement table = document.createElement("table");
+            table.setAttribute("value", query.value(0).toString());
+            schema.appendChild(table);
+            QDomElement module = document.createElement("module");
+            module.setAttribute("value", "default");
+            schema.appendChild(module);
+            QDomElement extend = document.createElement("extend");
+            extend.setAttribute("value", "");
+            schema.appendChild(extend);
+            QDomElement relations = document.createElement("relations");
+            schema.appendChild(relations);
+                QDomElement rel_table = document.createElement("table");
+                rel_table.setAttribute("value", "");
+                relations.appendChild(rel_table);
 
 
+            QDomElement model = document.createElement("model");
+            model.setAttribute("value", true);
+            schema.appendChild(model);
+            QDomElement controller = document.createElement("crud");
+            controller.setAttribute("value", true);
+            schema.appendChild(controller);
+            QDomElement form = document.createElement("form");
+            form.setAttribute("value", true);
+            schema.appendChild(form);
+            QDomElement view = document.createElement("view");
+            view.setAttribute("value", true);
+            schema.appendChild(view);
 
-        schema.appendChild(name);
-        QDomElement table = document.createElement("table");
-        table.setAttribute("value", query.value(0).toString());
-        schema.appendChild(table);
-        QDomElement module = document.createElement("module");
-        module.setAttribute("value", "default");
-        schema.appendChild(module);
-        QDomElement extend = document.createElement("extend");
-        extend.setAttribute("value", "");
-        schema.appendChild(extend);
-        QDomElement relations = document.createElement("relations");
-        schema.appendChild(relations);
-            QDomElement rel_table = document.createElement("table");
-            rel_table.setAttribute("value", "");
-            relations.appendChild(rel_table);
-
-
-        QDomElement model = document.createElement("model");
-        model.setAttribute("value", true);
-        schema.appendChild(model);
-        QDomElement controller = document.createElement("crud");
-        controller.setAttribute("value", true);
-        schema.appendChild(controller);
-        QDomElement form = document.createElement("form");
-        form.setAttribute("value", true);
-        schema.appendChild(form);
-        QDomElement view = document.createElement("view");
-        view.setAttribute("value", true);
-        schema.appendChild(view);
-
-        QDomElement log = document.createElement("log");
-        log.setAttribute("enable", false);
-        log.setAttribute("tableName", "tableName");
-        schema.appendChild(log);
+            QDomElement log = document.createElement("log");
+            log.setAttribute("enable", false);
+            log.setAttribute("tableName", "tableName");
+            schema.appendChild(log);
+        }
     }
     return document;
 }
