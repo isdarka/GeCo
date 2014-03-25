@@ -287,6 +287,18 @@ void GeCo::generateModel(GeCoBean model)
         query->write(this->path + "/module/Application/src/Application/Query/" + model.getName() + "Query.php");
 
 
+    //Generate Validator
+    ZfValidator *validator = new ZfValidator(model,this->beans);
+    validator->generate();
+    if(!model.isDefaultModule())
+        validator->write(this->path + "/module/" + model.getModule() + "/src/" + model.getModule() + "/Validator/" + model.getName() + "Validator.php");
+    else
+        validator->write(this->path + "/module/Application/src/Application/Validator/" + model.getName() + "Validator.php");
+
+//    Javascript
+    JsBean *jsbean = new JsBean(model,this->beans);
+    jsbean->generate();
+    jsbean->write(this->path + "/public/js/Bean/" + model.getName() + ".js");
 }
 
 void GeCo::generateCRUD(GeCoBean model)
@@ -338,6 +350,11 @@ void GeCo::createStructure()
     if (!modulePath.exists())
         modulePath.mkdir(modulePath.path());
 
+    QDir publicPath(dir.path().append("/public"));
+    if (!publicPath.exists())
+        publicPath.mkdir(publicPath.path());
+
+
     QDir defaultModule(modulePath.path().append("/Application"));
 
 
@@ -355,6 +372,10 @@ void GeCo::createStructure()
     QDir exception("Exception");
     QDir factory("Factory");
     QDir metadata("Metadata");
+
+    QDir validator("Validator");
+    QDir Js("js");
+
 
 QRegExp exp("([A-Z])");
     GeCoBean beanModel;
@@ -438,6 +459,28 @@ QRegExp exp("([A-Z])");
             tmp.setPath(tmp.path().append("/").append(metadata.path()));
             if (!tmp.exists())
                 tmp.mkdir(tmp.path());
+
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(validator.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+//            Javascript
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()).append("/").append(bean.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()).append("/").append(collection.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
 //            qDebug() << beanModel.getModule();
         }else{
             if (!defaultModule.exists())
@@ -511,6 +554,27 @@ QRegExp exp("([A-Z])");
             if (!tmp.exists())
                 tmp.mkdir(tmp.path());
 
+            tmp.setPath(moduleSrc.path());
+            tmp.setPath(tmp.path().append("/").append(validator.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+
+//            Javascript
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()).append("/").append(bean.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
+
+            tmp.setPath(publicPath.path());
+            tmp.setPath(tmp.path().append("/").append(Js.path()).append("/").append(collection.path()));
+            if (!tmp.exists())
+                tmp.mkdir(tmp.path());
         }
     }
 

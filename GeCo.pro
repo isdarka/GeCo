@@ -34,7 +34,11 @@ SOURCES += main.cpp\
     ZendFramework/zfcatalog.cpp \
     ZendFramework/zfcrud.cpp \
     ZendFramework/zfquery.cpp \
-    ZendFramework/zfview.cpp
+    ZendFramework/zfview.cpp \
+    ZendFramework/zfvalidator.cpp \
+    JavaScript/jsbean.cpp \
+    JavaScript/jscollection.cpp \
+    CodeGenerator/javascriptclass.cpp
 
 HEADERS  += mainwindow.h \
     DataBase/connection.h \
@@ -57,7 +61,11 @@ HEADERS  += mainwindow.h \
     ZendFramework/zfcatalog.h \
     ZendFramework/zfcrud.h \
     ZendFramework/zfquery.h \
-    ZendFramework/zfview.h
+    ZendFramework/zfview.h \
+    ZendFramework/zfvalidator.h \
+    JavaScript/jsbean.h \
+    JavaScript/jscollection.h \
+    CodeGenerator/javascriptclass.h
 
 FORMS    += mainwindow.ui \
     mysqlsettings.ui \

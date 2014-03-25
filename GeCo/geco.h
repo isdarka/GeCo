@@ -17,7 +17,9 @@
 #include "ZendFramework/zfcrud.h"
 #include "ZendFramework/zfquery.h"
 #include "ZendFramework/zfview.h"
-
+#include "ZendFramework/zfvalidator.h"
+#include "JavaScript/jsbean.h"
+#include "JavaScript/jscollection.h"
 class GeCo
 {
 public:

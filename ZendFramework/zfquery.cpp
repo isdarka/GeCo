@@ -112,8 +112,8 @@ void ZfQuery::generate(QString prefixString)
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Query");
     docblock.setLongDescription("GeCo");
-    docblock.addTag("autor", "isdarka");
-    docblock.addTag("category", "Model");
+    docblock.addTag("author", "isdarka");
+    docblock.addTag("category", "Query");
     docblock.addTag("package", "Query");
     docblock.addTag("copyright", "");
     docblock.addTag("license", "");

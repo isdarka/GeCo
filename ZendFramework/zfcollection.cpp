@@ -123,7 +123,7 @@ void ZfCollection::generate()
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Bean");
     docblock.setLongDescription("GeCo");
-    docblock.addTag("autor", "isdarka");
+    docblock.addTag("author", "isdarka");
     docblock.addTag("category", "Model");
     docblock.addTag("package", "Collection");
     docblock.addTag("copyright", "");
