@@ -104,7 +104,7 @@ QString ZfView::generateIndex()
 
                 index.append("\t").append("\t").append("\t").append("<tbody>").append("\n");
                 index.append("\t").append("\t").append("\t").append("\t").append("{foreach $").append(this->lcFirst(this->model.getName())).append("s as $").append(this->lcFirst(this->model.getName())).append("}").append("\n");
-                    index.append("\t").append("\t").append("\t").append("\t").append("<tr>").append("\n");
+                    index.append("\t").append("\t").append("\t").append("\t").append("<tr data-index=\"\">").append("\n");
 
                     foreach (column, this->columns) {
                         if(hasStatus && column.getField() == "status")
@@ -219,7 +219,7 @@ QString ZfView::generateForm()
 //    }
 
 
-    index.append("<form class=\"form-horizontal validate\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/save\">\n");
+    index.append("<form class=\"form-horizontal validate\" id=\"form\" method=\"post\" action=\"{$baseUrl}/" + this->model.getModule().toLower() + "/" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"/save\">\n");
     index.append("\t<input type=\"hidden\" name=\"" + this->lcFirst(this->ucfirst(primaryKey.getField()))  +"\" id=\"" + this->lcFirst(this->ucfirst(primaryKey.getField())) +"\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) + "()}\">\n");
     index.append("\t<div class=\"row\">\n");
     index.append("\t\t<div class=\"col-xs-6\">\n");
@@ -269,7 +269,7 @@ QString ZfView::generateForm()
                 {
                     QString entity = column.getField().mid(3, column.getField().size());
                     entity =this->lcFirst(this->ucfirst(entity));
-                    index.append("\t\t\t\t\t\t").append("{html_options options=array(\"{$i18n->translate('Select a option')}\") + $" + entity + "Collection->toCombo() name=\"" + column.getField() + "\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" class=\"form-control\" selected=$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}").append("\n");
+                    index.append("\t\t\t\t\t\t").append("{html_options options=array(\"{$i18n->translate('Select a option')}\") + $" + entity + "Collection->toCombo() name=\"" + column.getField() + "\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" class=\"form-control chosen required\" selected=$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}").append("\n");
 
 //{html_options options=array("{$i18n->translate("Select a option")}") + $phoneTypes name="phoneType" id="phoneType" class="form-control"}
                 }
@@ -304,7 +304,7 @@ QString ZfView::generateForm()
     index.append("\t<div class=\"form-group\">").append("\n");
     index.append("\t\t<div class=\"col-sm-offset-2 col-sm-10\">").append("\n");
     index.append("\t\t<a href=\"{url module=" + this->model.getModule().toLower() + " controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=index}\" class=\"btn btn-default\">{$i18n->translate('Cancel')}</a>").append("\n");
-    index.append("\t\t<button type=\"submit\" class=\"btn btn-primary\">{$i18n->translate('Save')}</button>").append("\n");
+    index.append("\t\t<button type=\"submit\" id=\"save\" class=\"btn btn-primary\">{$i18n->translate('Save')}</button>").append("\n");
     index.append("\t\t</div>").append("\n");
     index.append("\t</div>").append("\n");
     index.append("</form>\n");

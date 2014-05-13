@@ -51,11 +51,13 @@ void ZfCRUD::generate()
     this->code.addUse("BaseProject\\Controller\\BaseController");
 
 
+
     this->code.addUse(this->model.getModule() + "\\Query\\" +this->model.getName() + "Query");
     this->code.addUse(this->model.getModule() + "\\Model\\Bean\\" +this->model.getName() + "");
     this->code.addUse(this->model.getModule() + "\\Model\\Catalog\\" +this->model.getName() + "Catalog");
     this->code.addUse(this->model.getModule() + "\\Model\\Factory\\" +this->model.getName() + "Factory");
-
+    this->code.addUse(this->model.getModule() + "\\Model\\Exception\\" +this->model.getName() + "Exception");
+    this->code.addUse("Query\\Exception\\QueryException");
 
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
@@ -174,10 +176,10 @@ void ZfCRUD::generate()
     methodUpdate.addBody("try {");
     methodUpdate.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
     methodUpdate.addBody("\tif(!$id" + this->model.getName() +")");
-    methodUpdate.addBody("\t\tthrow new \\Exception($this->i18n->translate('" + this->model.getName() +" not defined.'));");
+    methodUpdate.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate('" + this->model.getName() +" not defined'));");
     methodUpdate.addBody("");
     methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
-    methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+    methodUpdate.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
 
 
     foreach (relation, foreingKeys) {
@@ -199,10 +201,16 @@ void ZfCRUD::generate()
     methodUpdate.addBody("\t//Views");
     methodUpdate.addBody("\t$this->view->" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +";");
     //methodUpdate.addBody("\treturn $this->view;");
-    methodUpdate.addBody("} catch (\\Exception $e) {");
+    methodUpdate.addBody("} catch (" + this->model.getName() +"Exception $e) {");
     methodUpdate.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-    methodUpdate.addBody("\t$this->redirect()->toRoute(null, array(");
-    methodUpdate.addBody("\t\t'controller' => '" + this->model.getName().toLower() +" ',");
+    methodUpdate.addBody("\treturn $this->redirect()->toRoute(null, array(");
+    methodUpdate.addBody("\t\t'controller' => '" + this->model.getName().toLower() +"',");
+    methodUpdate.addBody("\t\t'action' =>  'index',");
+    methodUpdate.addBody("\t));");
+    methodUpdate.addBody("} catch (QueryException $e) {");
+    methodUpdate.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+    methodUpdate.addBody("\treturn $this->redirect()->toRoute(null, array(");
+    methodUpdate.addBody("\t\t'controller' => '" + this->model.getName().toLower() +"',");
     methodUpdate.addBody("\t\t'action' =>  'index',");
     methodUpdate.addBody("\t));");
     methodUpdate.addBody("}");
@@ -225,7 +233,7 @@ void ZfCRUD::generate()
     methodSave.addBody("if($id" + this->model.getName() +")");
     methodSave.addBody("{");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
-    methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+    methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
     methodSave.addBody("}else{");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +" = new " + this->model.getName() +"();");
     //if has status
@@ -245,13 +253,13 @@ void ZfCRUD::generate()
 
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
     methodSave.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" Saved.');");
-    methodSave.addBody("} catch (\\Exception $e) {");
+    methodSave.addBody("} catch (" + this->model.getName() +"Exception $e) {");
     methodSave.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
     methodSave.addBody("}");
 
-    methodSave.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
-    methodSave.addBody("return $this->view;");
+    methodSave.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+//    methodSave.addBody("return $this->view;");
     methodSave.setDocblock(docblockSave);
     this->code.addMethod(methodSave);
 
@@ -269,21 +277,21 @@ void ZfCRUD::generate()
         methodEnable.addBody("try {");
         methodEnable.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodEnable.addBody("\tif(!$id" + this->model.getName() +")");
-        methodEnable.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+        methodEnable.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate(\"" + this->model.getName() +" not defined\"));");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
-        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
         if(this->model.getLog())
             methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodEnable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been enabled.');");
-        methodEnable.addBody("} catch (\\Exception $e) {");
+        methodEnable.addBody("} catch (" + this->model.getName() +"Exception $e) {");
         methodEnable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodEnable.addBody("}");
-        methodEnable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
-        methodEnable.addBody("return $this->view;");
+        methodEnable.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+//        methodEnable.addBody("return $this->view;");
         methodEnable.setDocblock(docblockEnable);
         this->code.addMethod(methodEnable);
 
@@ -298,21 +306,21 @@ void ZfCRUD::generate()
         methodDisable.addBody("try {");
         methodDisable.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodDisable.addBody("\tif(!$id" + this->model.getName() +")");
-        methodDisable.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+        methodDisable.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate(\"" + this->model.getName() +" not defined\"));");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
-        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
         if(this->model.getLog())
             methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
         methodDisable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been disabled.');");
-        methodDisable.addBody("} catch (\\Exception $e) {");
+        methodDisable.addBody("} catch (" + this->model.getName() +"Exception $e) {");
         methodDisable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodDisable.addBody("}");
-        methodDisable.addBody("$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
-        methodDisable.addBody("return $this->view;");
+        methodDisable.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+//        methodDisable.addBody("return $this->view;");
         methodDisable.setDocblock(docblockDisable);
         this->code.addMethod(methodDisable);
     }
@@ -347,13 +355,13 @@ void ZfCRUD::generate()
         methodHistory.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
         methodHistory.addBody("\t$page = $this->params()->fromRoute(\"page\", 1);");
         methodHistory.addBody("\tif(!$id" + this->model.getName() +" )");
-        methodHistory.addBody("\t\tthrow new \\Exception($this->i18n(\"" + this->model.getName() +" not defined.\"));");
+        methodHistory.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate(\"" + this->model.getName() +" not defined\"));");
 
         methodHistory.addBody("\t$userQuery = new UserQuery($this->getAdapter());");
         methodHistory.addBody("\t$users = $userQuery->find();");
 
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
-        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found.\"));");
+        methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery = new " + this->model.getName() +"LogQuery($this->getAdapter());");
         methodHistory.addBody("\t$" + this->lcFirst(this->model.getName()) +"LogQuery->whereAdd(" + this->model.getName() +"Log::" + primaryKey.getField().toUpper() +", $" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(primaryKey.getField()) +"());");
         methodHistory.addBody("\t$total = $" + this->lcFirst(this->model.getName()) +"LogQuery->count();");
@@ -372,9 +380,9 @@ void ZfCRUD::generate()
         methodHistory.addBody("\t$this->view->users = $users;");
 
         this->code.addUse("Core\\Query\\UserQuery");
-        methodHistory.addBody("} catch (\\Exception $e) {");
+        methodHistory.addBody("} catch (" + this->model.getName() +"Exception $e) {");
         methodHistory.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
-        methodHistory.addBody("\t$this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+        methodHistory.addBody("\treturn $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
         methodHistory.addBody("}");
         methodHistory.addBody("return $this->view;");
         methodHistory.setDocblock(History);

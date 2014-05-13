@@ -55,7 +55,7 @@ QString JavaScriptClass::generate()
         string.append("{").append("\n");
         string.append("\t").append("this.").append(property).append(" = ").append(property).append(";").append("\n");
         string.append("\t").append("return this;").append("\n");
-        string.append("}").append("\n");
+        string.append("};").append("\n");
         string.append("\n");
     }
 
@@ -66,7 +66,7 @@ QString JavaScriptClass::generate()
         string.append(" = function()").append("\n");
         string.append("{").append("\n");
         string.append("\t").append("return this.").append(property).append(";").append("\n");
-        string.append("}").append("\n");
+        string.append("};").append("\n");
         string.append("\n");
     }
     return string;

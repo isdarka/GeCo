@@ -88,7 +88,8 @@ QString PhpClass::generate()
     {
         code.append("\n");
         code.append("/**").append("\n");
-        code.append(" * ").append(this->getNamespace()).append("\\").append(this->getClassName()).append("\n");
+//        code.append(" * ").append(this->getNamespace()).append("\\").append(this->getClassName()).append("\n");
+        code.append(" * ").append(this->getClassName()).append("\n");
         QString methodDocblock;
         this->methodsDocblock.removeDuplicates();
         foreach (methodDocblock, this->methodsDocblock) {

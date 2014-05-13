@@ -43,6 +43,7 @@ void ZfException::generate()
 {
 
     GeCoBean extra;
+    this->code.addUse("Exception");
     this->code.setClassName(this->model.getName() + "Exception");
     if(!this->model.getExtend().isEmpty())
     {
@@ -50,7 +51,7 @@ void ZfException::generate()
      //   qDebug() << extra.getModule();
         this->code.setExtends(extra.getName() + "Exception");
     }else
-        this->code.setExtends("\\Exception");
+        this->code.setExtends("Exception");
 
 
     Docblock docblock;

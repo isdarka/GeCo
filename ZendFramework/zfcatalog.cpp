@@ -108,9 +108,9 @@ void ZfCatalog::generate(QString prefixString)
         methodCreate.addBody("\t\tself::getMetadata()->getPrimaryKey() => $this->getLastInsertId(),");
         methodCreate.addBody("\t));");
         methodCreate.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
-        methodCreate.addBody("\tthrow $e;");
+        methodCreate.addBody("\tthrow new \\Exception($e->getMessage());");
         methodCreate.addBody("} catch (" + this->model.getName() + "Exception $e) {");
-        methodCreate.addBody("\tthrow $e;");
+        methodCreate.addBody("\tthrow new \\Exception($e->getMessage());");
         methodCreate.addBody("}");
         methodCreate.setDocblock(docblockCreate);
         this->code.addMethod(methodCreate);
@@ -138,9 +138,9 @@ void ZfCatalog::generate(QString prefixString)
 
 
         methodUpdate.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
-        methodUpdate.addBody("\tthrow $e;");
+        methodUpdate.addBody("\tthrow new \\Exception($e->getMessage());");
         methodUpdate.addBody("} catch (" + this->model.getName() + "Exception $e) {");
-        methodUpdate.addBody("\tthrow $e;");
+        methodUpdate.addBody("\tthrow new \\Exception($e->getMessage());");
         methodUpdate.addBody("}");
         methodUpdate.setDocblock(docblockUpdate);
         this->code.addMethod(methodUpdate);
@@ -162,9 +162,9 @@ void ZfCatalog::generate(QString prefixString)
         methodDelete.addBody("\t$this->delete->where($where);");
         methodDelete.addBody("\t$this->execute($this->delete);");
         methodDelete.addBody("} catch (\\Zend\\Db\\Exception\\ExceptionInterface $e) {");
-        methodDelete.addBody("\tthrow $e;");
+        methodDelete.addBody("\tthrow new \\Exception($e->getMessage());");
         methodDelete.addBody("} catch (" + this->model.getName() + "Exception $e) {");
-        methodDelete.addBody("\tthrow $e;");
+        methodDelete.addBody("\tthrow new \\Exception($e->getMessage());");
         methodDelete.addBody("}");
         methodDelete.setDocblock(docblockDelete);
         this->code.addMethod(methodDelete);
