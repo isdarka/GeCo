@@ -58,7 +58,7 @@ void ZfCRUD::generate()
     this->code.addUse(this->model.getModule() + "\\Model\\Factory\\" +this->model.getName() + "Factory");
     this->code.addUse(this->model.getModule() + "\\Model\\Exception\\" +this->model.getName() + "Exception");
     this->code.addUse("Query\\Exception\\QueryException");
-
+    this->code.addUse("Exception");
     TableCatalog t;
     this->columns = t.getColumnsByTable(this->model.getTable());
     ColumnBean column;

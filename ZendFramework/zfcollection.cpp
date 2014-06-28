@@ -66,7 +66,9 @@ void ZfCollection::generate()
             hasName = true;
 
         if(column.isPkAutoIncrement())
-            primaryKey = column;
+        {
+            primaryKey = column;                                    
+        }
         if(column.isForeingKey()){
             Method method;
             Docblock docblock;
