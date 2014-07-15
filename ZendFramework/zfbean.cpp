@@ -1,4 +1,4 @@
-#include "zfbean.h"
+    #include "zfbean.h"
 
 ZfBean::ZfBean(GeCoBean model, QVector<GeCoBean> models)
 {
@@ -82,14 +82,30 @@ void ZfBean::generate()
         Propertie enable;
         enable.setName("ENABLE");
         enable.isConst(true);
+        enable.setIsInteger(true);
         enable.setDefaultValue("1");
         this->code.addPropertie(enable);
 
         Propertie disable;
         disable.setName("DISABLE");
         disable.isConst(true);
+        disable.setIsInteger(true);
         disable.setDefaultValue("2");
         this->code.addPropertie(disable);
+
+        Propertie lock;
+        lock.setName("LOCK");
+        lock.isConst(true);
+        lock.setIsInteger(true);
+        lock.setDefaultValue("3");
+        this->code.addPropertie(lock);
+
+        Propertie unlock;
+        unlock.setName("UNLOCK");
+        unlock.isConst(true);
+        unlock.setIsInteger(true);
+        unlock.setDefaultValue("4");
+        this->code.addPropertie(unlock);
     }
     //PRIVATES
     ColumnBean primaryKey;
@@ -230,12 +246,14 @@ void ZfBean::generate()
            Docblock docblockStatuses;
            docblockStatuses.setShortDescription("Statuses");
 
-           statuses.setName("$statuses");
+           statuses.setName(" $statuses");
            statuses.setVisibility(Method::PUBLIC);
            statuses.isStatic(true);
            statuses.isFunction(false);
-           statuses.addParam("self::ENABLE => \"Enable\"");
-           statuses.addParam("self::DISABLE => \"Disable\"");
+           statuses.addParam("\tself::ENABLE => \"Enabled\"");
+           statuses.addParam("\tself::DISABLE => \"Disabled\"");
+           statuses.addParam("\tself::LOCK => \"Locked\"");
+           statuses.addParam("\tself::UNLOCK => \"Unlocked\"");
            statuses.addBody("");
            statuses.setDocblock(docblockStatuses);
            this->code.addMethod(statuses);
@@ -272,6 +290,19 @@ void ZfBean::generate()
            statusName.addBody("return self::$statuses[$this->getStatus()];");
            statusName.setDocblock(docblockStatusName);
            this->code.addMethod(statusName);
+
+           Method isLocked;
+           Docblock docblockIsLocked;
+           docblockIsLocked.setShortDescription(this->lcFirst(this->ucfirst(primaryKey.getField())) + " is locked");
+           docblockIsLocked.addTag("return","boolean");
+
+           isLocked.setName("isLocked");
+           isLocked.setVisibility(Method::PUBLIC);
+           isLocked.addBody("return self::LOCK == $this->getStatus();");
+           isLocked.setDocblock(docblockIsLocked);
+           this->code.addMethod(isLocked);
+
+
        }
 }
 

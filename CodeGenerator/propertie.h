@@ -12,12 +12,14 @@ public:
     void setVisibility(QString type);
     void setDefaultValue(QString value);
     void isConst(bool boolean);
+    void setIsInteger(bool boolean);
     QString getPropertie();
 private:
     QString visibility;
     QString name;
     QString defaultValue;
     bool constant;
+    bool isInteger = false;
 };
 
 #endif // PROPERTIE_H

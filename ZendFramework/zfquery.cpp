@@ -109,6 +109,34 @@ void ZfQuery::generate(QString prefixString)
     this->code.addMethod(methodConstruct);
 
 
+    TableCatalog t;
+    this->columns = t.getColumnsByTable(this->model.getTable());
+    ColumnBean column;
+    bool hasStatus = false;
+    foreach (column, this->columns) {
+        if(column.getField().toUpper() == "STATUS")
+        {
+            hasStatus = true;
+        }
+    }
+
+    if(hasStatus)
+    {
+        Method methodStatus;
+        Docblock docblockStatus;
+        docblockStatus.setShortDescription("Actives");
+        docblockStatus.addTag("return",  this->model.getName() + "Query");
+        methodStatus.setName("actives");
+        methodStatus.setVisibility(Method::PUBLIC);
+        methodStatus.isStatic(false);
+        methodStatus.addBody("$this->whereAdd(" + this->model.getName() + "::STATUS, " + this->model.getName() + "::ENABLE);");
+        methodStatus.addBody("return $this;");
+
+        methodStatus.setDocblock(docblockStatus);
+        this->code.addMethod(methodStatus);
+    }
+
+
     Docblock docblock;
     docblock.setShortDescription(this->model.getName() + "Query");
     docblock.setLongDescription("GeCo");

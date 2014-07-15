@@ -57,7 +57,7 @@ void ZfFactory::generate()
         this->code.addUse("Model\\Factory\\AbstractFactory");
     }
 
-
+this->code.addUse("Zend\\Db\\Sql\\Expression");
 
     Method methodCreateFromArray;
     Docblock docblockTCreateFromArray;
@@ -110,13 +110,12 @@ void ZfFactory::generate()
         condition.append("){");
         methodPopulate.addBody(condition);
             methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"($fields[" + this->model.getName() +"::" + column.getField().toUpper() +"]);");
-//        if(column.getNull())
-//        {
-//            this->code.addUse("Zend\\Db\\Sql\\Expression");
-//            methodPopulate.addBody("}else{");
-//            methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"(new Expression('NULL'));");
+        if(column.getNull())
+        {
+            methodPopulate.addBody("}else{");
+            methodPopulate.addBody("\t$" + this->lcFirst(this->model.getName()) +"->set" + this->ucfirst(column.getField()) +"(new Expression(\"null\"));");
 
-//        }
+        }
         methodPopulate.addBody("}");
         methodPopulate.addBody("");
     }

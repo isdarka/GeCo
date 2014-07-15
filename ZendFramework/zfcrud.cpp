@@ -213,6 +213,12 @@ void ZfCRUD::generate()
     methodUpdate.addBody("\t\t'controller' => '" + this->model.getName().toLower() +"',");
     methodUpdate.addBody("\t\t'action' =>  'index',");
     methodUpdate.addBody("\t));");
+    methodUpdate.addBody("} catch (Exception $e) {");
+    methodUpdate.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+    methodUpdate.addBody("\treturn $this->redirect()->toRoute(null, array(");
+    methodUpdate.addBody("\t\t'controller' => '" + this->model.getName().toLower() +"',");
+    methodUpdate.addBody("\t\t'action' =>  'index',");
+    methodUpdate.addBody("\t));");
     methodUpdate.addBody("}");
 
     methodUpdate.addBody("//Views");
@@ -256,7 +262,11 @@ void ZfCRUD::generate()
     methodSave.addBody("} catch (" + this->model.getName() +"Exception $e) {");
     methodSave.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
     methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+    methodSave.addBody("} catch (Exception $e) {");
+    methodSave.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+    methodSave.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
     methodSave.addBody("}");
+
 
     methodSave.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
 //    methodSave.addBody("return $this->view;");
@@ -285,8 +295,11 @@ void ZfCRUD::generate()
         if(this->model.getLog())
             methodEnable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::ENABLE);");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
-        methodEnable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been enabled.');");
+        methodEnable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been enabled');");
         methodEnable.addBody("} catch (" + this->model.getName() +"Exception $e) {");
+        methodEnable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodEnable.addBody("} catch (Exception $e) {");
         methodEnable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodEnable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodEnable.addBody("}");
@@ -314,8 +327,11 @@ void ZfCRUD::generate()
         if(this->model.getLog())
             methodDisable.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::DISABLE);");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
-        methodDisable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been disabled.');");
+        methodDisable.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been disabled');");
         methodDisable.addBody("} catch (" + this->model.getName() +"Exception $e) {");
+        methodDisable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodDisable.addBody("} catch (Exception $e) {");
         methodDisable.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
         methodDisable.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
         methodDisable.addBody("}");
@@ -323,6 +339,74 @@ void ZfCRUD::generate()
 //        methodDisable.addBody("return $this->view;");
         methodDisable.setDocblock(docblockDisable);
         this->code.addMethod(methodDisable);
+
+
+//        Lock
+        Method methodLock;
+        Docblock docblockLock;
+        docblockLock.setShortDescription("Lock");
+        methodLock.setName("lockAction");
+        methodLock.setVisibility(Method::PUBLIC);
+        methodLock.isStatic(false);
+        methodLock.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdapter());");
+        methodLock.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
+        methodLock.addBody("try {");
+        methodLock.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
+        methodLock.addBody("\tif(!$id" + this->model.getName() +")");
+        methodLock.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate(\"" + this->model.getName() +" not defined\"));");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::LOCK);");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
+        if(this->model.getLog())
+            methodLock.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::LOCKED);");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
+        methodLock.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been locked');");
+        methodLock.addBody("} catch (" + this->model.getName() +"Exception $e) {");
+        methodLock.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodLock.addBody("} catch (Exception $e) {");
+        methodLock.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodLock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodLock.addBody("}");
+        methodLock.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+//        methodDisable.addBody("return $this->view;");
+        methodLock.setDocblock(docblockLock);
+        this->code.addMethod(methodLock);
+
+
+        //        Unlock
+        Method methodUnlock;
+        Docblock docblockUnlock;
+        docblockUnlock.setShortDescription("Unlock");
+        methodUnlock.setName("unlockAction");
+        methodUnlock.setVisibility(Method::PUBLIC);
+        methodUnlock.isStatic(false);
+        methodUnlock.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog = new " + this->model.getName() +"Catalog($this->getAdapter());");
+        methodUnlock.addBody("$" + this->lcFirst(this->model.getName()) +"Catalog->beginTransaction();");
+        methodUnlock.addBody("try {");
+        methodUnlock.addBody("\t$id" + this->model.getName() +" = $this->params()->fromRoute(\"id\", 0);");
+        methodUnlock.addBody("\tif(!$id" + this->model.getName() +")");
+        methodUnlock.addBody("\t\tthrow new " + this->model.getName() +"Exception($this->i18n->translate(\"" + this->model.getName() +" not defined\"));");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Query = new " + this->model.getName() +"Query($this->getAdapter());");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +" = $" + this->lcFirst(this->model.getName()) +"Query->findByPkOrThrow($id" + this->model.getName() +", $this->i18n->translate(\"" + this->model.getName() +" not found\"));");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"->setStatus(" + this->model.getName() +"::ENABLE);");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->save($" + this->lcFirst(this->model.getName()) +");");
+        if(this->model.getLog())
+            methodUnlock.addBody("\t$this->newLog($" + this->lcFirst(this->model.getName()) +", " + this->model.getName() +"::UNLOCKED);");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->commit();");
+        methodUnlock.addBody("\t$this->flashMessenger()->addSuccessMessage('" + this->model.getName() +" has been unlocked');");
+        methodUnlock.addBody("} catch (" + this->model.getName() +"Exception $e) {");
+        methodUnlock.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodUnlock.addBody("} catch (Exception $e) {");
+        methodUnlock.addBody("\t$this->flashMessenger()->addErrorMessage($e->getMessage());");
+        methodUnlock.addBody("\t$" + this->lcFirst(this->model.getName()) +"Catalog->rollback();");
+        methodUnlock.addBody("}");
+        methodUnlock.addBody("return $this->redirect()->toRoute(null,array('controller'=>'" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"','action' => 'index',));");
+//        methodDisable.addBody("return $this->view;");
+        methodUnlock.setDocblock(docblockUnlock);
+        this->code.addMethod(methodUnlock);
     }
 
     if(this->model.getLog())

@@ -27,6 +27,11 @@ void Propertie::isConst(bool boolean)
     this->constant = boolean;
 }
 
+void Propertie::setIsInteger(bool boolean)
+{
+    this->isInteger = boolean;
+}
+
 QString Propertie::getPropertie()
 {
     try{
@@ -38,7 +43,10 @@ QString Propertie::getPropertie()
             if(this->defaultValue.isEmpty())
                 throw QString("Default value can't be empty for constant");
             propertie.append("const " + this->name + " = ");
-            propertie.append("'" + this->defaultValue+ "';");
+            if(this->isInteger)
+                propertie.append("" + this->defaultValue+ ";");
+            else
+                propertie.append("'" + this->defaultValue+ "';");
         }else{
             //public $baz = 'bat';
             if(this->visibility.isEmpty())
@@ -46,8 +54,13 @@ QString Propertie::getPropertie()
             propertie.append(this->visibility + " $" + this->name);
             if(this->defaultValue.isEmpty())
                 propertie.append(";");
-            else
-                propertie.append(" = '" + this->defaultValue+ "';");
+            else{
+                if(this->isInteger)
+                    propertie.append(" = " + this->defaultValue+ ";");
+                else
+                    propertie.append(" = '" + this->defaultValue+ "';");
+            }
+
 
         }
 

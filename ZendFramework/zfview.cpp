@@ -121,7 +121,7 @@ QString ZfView::generateIndex()
                     //{if "Core\Controller\Role::update"|isAllowed}
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{if '" + allow + "update'|isAllowed}").append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t")
-                            .append("\t<a href=\"{url module=" + this->model.getModule().toLower()  +" controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=update id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
+                            .append("\t<a href=\"{url module='" + this->model.getModule().toLower()  +"' controller='" + this->lcFirst(this->ucfirst(this->model.getName())).replace(exp, "-\\1").toLower() +"' action=update id=$" + this->lcFirst(this->model.getName())+ "->get" + this->ucfirst(primaryKey.getField()) + "()}\" class=\"btn btn-default\" data-toggle=\"tooltip\" title=\"{$i18n->translate('Edit')}\"><span class=\"fa fa-pencil\"></span></a>")
                             .append("\n");
                     index.append("\t").append("\t").append("\t").append("\t").append("\t").append("\t").append("{/if}").append("\n");
 //<a href="{url module=core controller=user action=update idUser=$user->getIdUser()}" class="btn btn-default" data-toggle="tooltip" title="{$i18n->translate('Edit')}"><span class="fa fa-pencil"></span></a>
@@ -282,7 +282,7 @@ QString ZfView::generateForm()
                 else if (column.isTime())
                     index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required timepicker\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\" >").append("\n");
                 else if (column.isLongText())
-                    index.append("\t\t\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\"</textarea>").append("\n");
+                    index.append("\t\t\t\t\t\t").append("<textarea class=\"form-control required \" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" >{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}</textarea>").append("\n");
                 else
                     index.append("\t\t\t\t\t\t").append("<input type=\"text\" class=\"form-control required\" id=\"" + this->lcFirst(this->ucfirst(column.getField())) +"\" name=\"" + column.getField() + "\" value=\"{$" + this->lcFirst(this->model.getName()) +"->get" + this->ucfirst(column.getField()) +"()}\">").append("\n");
                 index.append("\t\t\t\t\t").append("</div>").append("\n");
